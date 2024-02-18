@@ -7,8 +7,8 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.SOURCE)
-public @interface PageElement {
+public @interface PageElementGen {
 
-    String value();
+    String value() default "";
 
 }

@@ -18,5 +18,9 @@ public class Button extends BaseElement {
         element.doubleClick();
     }
 
+    public void tripleClick() {
+        element.doubleClick().click();
+    }
+
 
 }

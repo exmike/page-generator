@@ -1,14 +1,20 @@
 package test.page;
 
+import annotation.PageElementGen;
 import com.codeborne.selenide.appium.SelenideAppiumElement;
 import annotation.PageObject;
+import io.appium.java_client.pagefactory.AndroidFindBy;
 
 @PageObject
 public class LoginPage {
 
+    @PageElementGen(value = "лайк")
+    @AndroidFindBy(xpath = "xpath")
+    private SelenideAppiumElement likeButton;
 
-    public SelenideAppiumElement likeButton;
 
-    public SelenideAppiumElement titleLabel;
+    @AndroidFindBy(xpath = "xpath")
+    @PageElementGen(value = "тайтл")
+    private SelenideAppiumElement titleLabel;
 
 }
