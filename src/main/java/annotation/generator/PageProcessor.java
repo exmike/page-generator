@@ -32,7 +32,6 @@ public class PageProcessor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         Logger log = new Logger(processingEnv.getMessager());
         PageGenerator pageGenerator = new PageGenerator(log, roundEnv, new SpecsCreator());
-
         //собрали доступные Widget'ы
         List<WidgetModel> widgets = pageGenerator.collectWidgets();
         if (widgets.isEmpty()) {
@@ -72,11 +71,11 @@ public class PageProcessor extends AbstractProcessor {
     /*
     todo list
     - Генерить к каждому виджету методы из BaseElement (done)
-    - Доработать механизм передачи параметров в сгенерированный метод
+    - Доработать механизм передачи параметров в сгенерированный метод(done)
     - В проекте избавиться от оверрайда в виджетах
     - Реализовать полноценный перенос аннотаций с полей(done)
-    - Добавить @Step к сгенеренным методам
-    - Добавить логгирование аналогичное собранному значению в @Step'e
+    - *Добавить @Step к сгенеренным методам
+    - *Добавить логгирование аналогичное собранному значению в @Step'e
     - Помолиться
      */
 
