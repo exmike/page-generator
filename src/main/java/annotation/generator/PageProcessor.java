@@ -4,7 +4,6 @@ import static util.Utils.PACKAGE_NAME;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -21,7 +20,6 @@ import javax.lang.model.element.TypeElement;
 import lombok.SneakyThrows;
 import model.Page;
 import model.WidgetModel;
-import org.checkerframework.checker.units.qual.A;
 import util.Logger;
 
 @SupportedAnnotationTypes("annotation.*")
@@ -34,7 +32,7 @@ public class PageProcessor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         Logger log = new Logger(processingEnv.getMessager());
         PageGenerator pageGenerator = new PageGenerator(log, roundEnv, new SpecsCreator());
-        log.warn(annotations.toString());
+
         //собрали доступные Widget'ы
         List<WidgetModel> widgets = pageGenerator.collectWidgets();
         if (widgets.isEmpty()) {
@@ -48,13 +46,8 @@ public class PageProcessor extends AbstractProcessor {
             return true;
         }
 
-        //todo вынести и переделать, пока закостылил добавление всех методов из baseElement к остальным element
-        List<ExecutableElement> executableElements = pageGenerator.baseMethods(baseElement.get());
-        widgets.forEach(widgetModel -> {
-            List<ExecutableElement> methods = new ArrayList<>(widgetModel.getMethods());
-            methods.addAll(executableElements);
-            widgetModel.setMethods(methods);
-        });
+        //добавление всех методов из baseElement к остальным widget'am
+        pageGenerator.addBaseMethodsToEachWidget(baseElement.get(), widgets);
 
         //собрали доступные PageObject'ы
         List<Page> pages = pageGenerator.collectPages(widgets);
@@ -85,6 +78,5 @@ public class PageProcessor extends AbstractProcessor {
     - Добавить @Step к сгенеренным методам
     - Добавить логгирование аналогичное собранному значению в @Step'e
     - Помолиться
-
      */
 

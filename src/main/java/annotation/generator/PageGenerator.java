@@ -12,7 +12,6 @@ import enums.WidgetAction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
@@ -42,7 +41,8 @@ public class PageGenerator {
             List<ExecutableElement> methods = getPublicMethods(widget);
             if (!methods.isEmpty()) {
                 widgets.add(
-                    new WidgetModel(widget.asType(), methods, getActionByClassName(widget.getSimpleName().toString())));
+                    new WidgetModel(widget.asType(), new ArrayList<>(methods),
+                        getActionByClassName(widget.getSimpleName().toString())));
             } else {
                 log.warn("no public methods in ", widget.getSimpleName());
             }
@@ -77,6 +77,7 @@ public class PageGenerator {
 
     /*
     К каждой page генерируется пачка методов на основе доступных Widget'ов
+    NB!!! необходимо добавлять новые case если появляются новые Widget'ы
      */
     public void generateMethodsToPage(List<Page> pages) {
         pages.forEach(page -> {
@@ -90,39 +91,23 @@ public class PageGenerator {
         });
     }
 
+    /*
+    Метод для сохранения сгенерированных MethodSpec в каждый из объектов Page
+     */
     private void processMethodSpecsByAction(WidgetAction action,
         List<MethodSpec> methodSpecs, VariableElement field, Page page) {
-        WidgetModel widget = getWidgetByWidgetAction(page.getWidgets(), action);
-        widget.getMethods().forEach(method -> methodSpecs.add(getMethodSpec(method, field, page, widget)));
+        WidgetModel widget = page.getWidgets().stream()
+            .filter(currentWidget -> currentWidget.getWidgetAction() == action)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("processMethodSpecsByAction"));
+        widget.getMethods()
+            .forEach(method -> methodSpecs.add(specsCreator.getMethodSpec(method, field, page, widget).build()));
         page.setMethodSpecs(methodSpecs);
     }
 
-    private WidgetModel getWidgetByWidgetAction(List<WidgetModel> widgets, WidgetAction widgetAction) {
-        return widgets.stream()
-            .filter(widget -> widget.getWidgetAction() == widgetAction)
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("getWidgetByWidgetAction"));
-    }
-
-    private MethodSpec getMethodSpec(ExecutableElement method, VariableElement field, Page page, WidgetModel widget) {
-        return MethodSpec.methodBuilder(
-                field.getSimpleName().toString() + "_" + method.getSimpleName().toString())
-            .addModifiers(Modifier.PUBLIC)
-            //todo потом реализовать добавление аннотации
-//            .addAnnotation(AnnotationSpec.builder(Step.class)
-//                .addMember("value", "$S",
-//                    page.getPageName() + ". " + method.getSimpleName().toString() + " " + field.getAnnotation(
-//                        PageElementGen.class).value())
-//                .build())
-            //todo
-            .addStatement(
-                "new $T(" + field.getSimpleName() + ")." + method.getSimpleName() + "()", widget.getType())
-
-            .returns(ClassName.get(PACKAGE_NAME, page.getPageName()))
-            .addStatement("return this")
-            .build();
-    }
-
+    /*
+    Метод для генерация всех классов на основе собранных объектов Page
+     */
     public List<TypeSpec> generateClasses(List<Page> pages) {
         List<TypeSpec> specs = new ArrayList<>();
         pages.forEach(page -> specs.add(specsCreator.getTypeSpecFromPage(page).build()));
@@ -130,6 +115,9 @@ public class PageGenerator {
 
     }
 
+    /*
+    Получение всех публичных методов из виджета
+     */
     private List<ExecutableElement> getPublicMethods(Element widget) {
         List<ExecutableElement> methods = ElementFilter.methodsIn(widget.getEnclosedElements());
         methods = methods.stream()
@@ -139,10 +127,21 @@ public class PageGenerator {
         return methods;
     }
 
-    public List<ExecutableElement> baseMethods(Element baseElement) {
-        return getPublicMethods(baseElement);
+    /*
+    Метод для добавления всех методов из BaseWidget к остальным Widget'ам
+     */
+    public void addBaseMethodsToEachWidget(Element baseElement, List<WidgetModel> widgets) {
+        List<ExecutableElement> publicBaseElementMethods = getPublicMethods(baseElement);
+        widgets.forEach(widget -> {
+            List<ExecutableElement> widgetMethods = widget.getMethods();
+            widgetMethods.addAll(publicBaseElementMethods);
+            widget.setMethods(widgetMethods);
+        });
     }
 
+    /*
+    Проверка наличия обязательной аннотации BaseWidget
+     */
     public Optional<Element> checkBaseWidget() {
         List<? extends Element> baseElements = this.roundEnv.getElementsAnnotatedWith(BaseWidget.class).stream()
             .toList();
@@ -154,6 +153,5 @@ public class PageGenerator {
         }
         return Optional.of(baseElements.get(0));
     }
-
 
 }
