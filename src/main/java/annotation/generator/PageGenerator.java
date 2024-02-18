@@ -1,11 +1,9 @@
 package annotation.generator;
 
 import static enums.WidgetAction.getActionByClassName;
-import static util.Utils.PACKAGE_NAME;
 import annotation.BaseWidget;
 import annotation.PageObject;
 import annotation.Widget;
-import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 import enums.WidgetAction;
@@ -100,8 +98,19 @@ public class PageGenerator {
             .filter(currentWidget -> currentWidget.getWidgetAction() == action)
             .findFirst()
             .orElseThrow(() -> new RuntimeException("processMethodSpecsByAction"));
-        widget.getMethods()
-            .forEach(method -> methodSpecs.add(specsCreator.getMethodSpec(method, field, page, widget).build()));
+        widget.getMethods().forEach(method -> {
+                if (method.getParameters().isEmpty() && method.getTypeParameters().isEmpty()) {
+                    methodSpecs.add(specsCreator.getMethodSpecWithoutParams(method, field, page, widget).build());
+                    return;
+                }
+                if (!method.getTypeParameters().isEmpty()) {
+                    methodSpecs.add(specsCreator.getMethodSpecWithTypeParams(method, field, page, widget).build());
+                    return;
+                }
+                if (!method.getParameters().isEmpty()) {
+                    methodSpecs.add(specsCreator.getMethodSpecWithParams(method, field, page, widget).build());
+                }
+            });
         page.setMethodSpecs(methodSpecs);
     }
 
@@ -112,7 +121,6 @@ public class PageGenerator {
         List<TypeSpec> specs = new ArrayList<>();
         pages.forEach(page -> specs.add(specsCreator.getTypeSpecFromPage(page).build()));
         return specs;
-
     }
 
     /*
