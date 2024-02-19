@@ -4,7 +4,6 @@ import static util.Utils.PACKAGE_NAME;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -15,7 +14,6 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import lombok.SneakyThrows;
 import model.Page;
@@ -78,4 +76,3 @@ public class PageProcessor extends AbstractProcessor {
     - *Добавить логгирование аналогичное собранному значению в @Step'e
     - Помолиться
      */
-

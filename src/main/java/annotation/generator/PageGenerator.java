@@ -118,9 +118,10 @@ public class PageGenerator {
     Метод для генерация всех классов на основе собранных объектов Page
      */
     public List<TypeSpec> generateClasses(List<Page> pages) {
-        List<TypeSpec> specs = new ArrayList<>();
-        pages.forEach(page -> specs.add(specsCreator.getTypeSpecFromPage(page).build()));
-        return specs;
+        // todo а почему нельзя методреференс где статика
+        return pages.stream()
+            .map(page -> specsCreator.getTypeSpecFromPage(page))
+            .toList();
     }
 
     /*
