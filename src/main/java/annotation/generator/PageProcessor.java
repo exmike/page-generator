@@ -25,11 +25,23 @@ import util.Logger;
 @AutoService(Processor.class)
 public class PageProcessor extends AbstractProcessor {
 
+    private int roundCount = 0;
+
     @Override
     @SneakyThrows
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+        roundCount++;
         Logger log = new Logger(processingEnv.getMessager());
         PageGenerator pageGenerator = new PageGenerator(log, roundEnv, new SpecsCreator());
+        log.warn(String.valueOf(roundCount));
+
+        if (roundCount == 2) {
+            pageGenerator.generateScreenManager(processingEnv);
+            return true;
+        }
+        if (roundCount > 2){
+            return true;
+        }
         //собрали доступные Widget'ы
         List<WidgetModel> widgets = pageGenerator.collectWidgets();
         if (widgets.isEmpty()) {
@@ -69,8 +81,8 @@ public class PageProcessor extends AbstractProcessor {
     /*
     todo list
     - Нужен механизм для генерации методов в определенные пейджи на основе полей из BaseScreen
-    - Нужен механизм для возможности итераций по раундам
-    - Генерировать screenManager'a на основе уже сгенерированных классов
+    - Нужен механизм для возможности итераций по раундам (kek done)
+    - Генерировать screenManager'a на основе уже сгенерированных классов (done)
     - Генерировать WidgetAction на основе доступных widget'ов в пакете
     - Генерить к каждому виджету методы из BaseElement (done)
     - Доработать механизм передачи параметров в сгенерированный метод(done)

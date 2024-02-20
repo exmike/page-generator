@@ -1,15 +1,19 @@
 package annotation.generator;
 
 import static enums.WidgetAction.getActionByClassName;
+import static util.Utils.PACKAGE_NAME;
+import annotation.AutoGenPage;
 import annotation.BaseWidget;
 import annotation.PageObject;
 import annotation.Widget;
+import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 import enums.WidgetAction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
@@ -17,6 +21,7 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementFilter;
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import model.Page;
 import model.WidgetModel;
 import util.Logger;
@@ -99,18 +104,18 @@ public class PageGenerator {
             .findFirst()
             .orElseThrow(() -> new RuntimeException("processMethodSpecsByAction"));
         widget.getMethods().forEach(method -> {
-                if (method.getParameters().isEmpty() && method.getTypeParameters().isEmpty()) {
-                    methodSpecs.add(specsCreator.getMethodSpecWithoutParams(method, field, page, widget).build());
-                    return;
-                }
-                if (!method.getTypeParameters().isEmpty()) {
-                    methodSpecs.add(specsCreator.getMethodSpecWithTypeParams(method, field, page, widget).build());
-                    return;
-                }
-                if (!method.getParameters().isEmpty()) {
-                    methodSpecs.add(specsCreator.getMethodSpecWithParams(method, field, page, widget).build());
-                }
-            });
+            if (method.getParameters().isEmpty() && method.getTypeParameters().isEmpty()) {
+                methodSpecs.add(specsCreator.getMethodSpecWithoutParams(method, field, page, widget).build());
+                return;
+            }
+            if (!method.getTypeParameters().isEmpty()) {
+                methodSpecs.add(specsCreator.getMethodSpecWithTypeParams(method, field, page, widget).build());
+                return;
+            }
+            if (!method.getParameters().isEmpty()) {
+                methodSpecs.add(specsCreator.getMethodSpecWithParams(method, field, page, widget).build());
+            }
+        });
         page.setMethodSpecs(methodSpecs);
     }
 
@@ -162,5 +167,20 @@ public class PageGenerator {
         }
         return Optional.of(baseElements.get(0));
     }
+
+    @SneakyThrows
+    public void generateScreenManager(ProcessingEnvironment environment) {
+        List<MethodSpec> methodSpecs = this.roundEnv.getElementsAnnotatedWith(AutoGenPage.class).stream()
+            .map(SpecsCreator::generateScreenMethods)
+            .toList();
+
+        TypeSpec screenManagerSpec = TypeSpec.classBuilder("ScreenManagerGen")
+            .addModifiers(Modifier.PUBLIC)
+            .addMethods(methodSpecs)
+            .build();
+        JavaFile.builder(PACKAGE_NAME, screenManagerSpec).build().writeTo(environment.getFiler());
+
+    }
+
 
 }
