@@ -52,13 +52,12 @@ public class SpecsCreator {
                 "new $T(" + field.getSimpleName() + ")." + method.getSimpleName() +
                     "(" + Utils.formatParamListToString(parameterSpecs) + ")", widget.getType())
             .addStatement("return this");
-
     }
 
     public MethodSpec.Builder getMethodSpecWithTypeParams(ExecutableElement method, VariableElement field, Page page,
         WidgetModel widget) {
         return getMethodSpecWithParams(method, field, page, widget)
-            .addTypeVariable(TypeVariableName.get("T"));
+            .addTypeVariable(TypeVariableName.get("T"));//todo remove T and process each type param
     }
 
     /*
