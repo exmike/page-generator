@@ -25,13 +25,18 @@ public class BaseElement {
         return this;
     }
 
-    public BaseElement checkText(String text,String text1,String text2) {
+    public BaseElement checkText(String text, String text1, String text2) {
         element.shouldHave(text(text));
         System.out.println(text1);
         return this;
     }
 
-    public <T> BaseElement checkText(T text) {
+    public <T, P> BaseElement checkText(T text, P kek) {
+        element.shouldHave(text(text.toString()));
+        return this;
+    }
+
+    public <Bogdan> BaseElement checkText(Bogdan text) {
         element.shouldHave(text(text.toString()));
         return this;
     }
