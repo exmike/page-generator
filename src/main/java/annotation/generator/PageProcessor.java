@@ -33,7 +33,6 @@ public class PageProcessor extends AbstractProcessor {
         roundCount++;
         Logger log = new Logger(processingEnv.getMessager());
         PageGenerator pageGenerator = new PageGenerator(log, roundEnv, new SpecsCreator());
-        log.warn(String.valueOf(roundCount));
 
         if (roundCount == 2) {
             pageGenerator.generateScreenManager(processingEnv);
