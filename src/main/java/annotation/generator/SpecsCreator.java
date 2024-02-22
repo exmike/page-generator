@@ -94,15 +94,15 @@ public class SpecsCreator {
     private FieldSpec generateFieldSpecFromField(VariableElement field) {
         return FieldSpec.builder(TypeName.get(field.asType()), field.getSimpleName().toString())
             .addModifiers(Modifier.PRIVATE)
-            .addAnnotations(annotationSpecsFromField(field))
+            .addAnnotations(annotationSpecsFromElement(field))
             .build();
     }
 
     /*
     Собираем все аннотации с поля в List AnnotationSpec
      */
-    private List<AnnotationSpec> annotationSpecsFromField(VariableElement field) {
-        return field.getAnnotationMirrors()
+    private List<AnnotationSpec> annotationSpecsFromElement(Element element) {
+        return element.getAnnotationMirrors()
             .stream()
             .map(AnnotationSpec::get)
             .toList();

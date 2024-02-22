@@ -6,7 +6,7 @@ import annotation.PageObject;
 import io.appium.java_client.pagefactory.AndroidFindBy;
 
 @PageObject
-public class LoginPage {
+public class LoginScreen extends BaseScreen{
 
     @PageElementGen(value = "лайк")
     @AndroidFindBy(xpath = "xpath")
