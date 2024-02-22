@@ -36,4 +36,9 @@ public class BaseElement {
         return this;
     }
 
+    public <Bogdan> BaseElement checkText(Bogdan text) {
+        element.shouldHave(text(text.toString()));
+        return this;
+    }
+
 }
