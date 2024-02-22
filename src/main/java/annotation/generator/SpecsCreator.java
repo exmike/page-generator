@@ -15,6 +15,7 @@ import java.util.List;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
 import model.Page;
 import model.WidgetModel;
@@ -60,7 +61,13 @@ public class SpecsCreator {
     public MethodSpec.Builder getMethodSpecWithTypeParams(ExecutableElement method, VariableElement field, Page page,
         WidgetModel widget) {
         return getMethodSpecWithParams(method, field, page, widget)
-            .addTypeVariable(TypeVariableName.get("T"));//todo remove T and process each type param
+            .addTypeVariables(getTypeParamsFromMethod(method.getTypeParameters()));
+    }
+
+    private List<TypeVariableName> getTypeParamsFromMethod(List<? extends TypeParameterElement> typeParameterElements) {
+        return typeParameterElements.stream()
+            .map(TypeVariableName::get)
+            .toList();
     }
 
     /*

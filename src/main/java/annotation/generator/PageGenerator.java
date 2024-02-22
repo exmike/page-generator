@@ -64,7 +64,8 @@ public class PageGenerator {
             //todo проверка что на филде есть аннотация PageElement и она не пустая
             //проверка что поля в PageObject'ах имеют модификатор private
             List<VariableElement> publicFields = fields.stream()
-                .filter(field -> field.getModifiers().contains(Modifier.PUBLIC)).toList();
+                .filter(field -> field.getModifiers().contains(Modifier.PUBLIC))
+                .toList();
             if (!publicFields.isEmpty()) {
                 publicFields.forEach(
                     variableElement -> log.error("Field %s in class %s must be private, not public ",
