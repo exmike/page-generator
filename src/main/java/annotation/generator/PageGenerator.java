@@ -43,8 +43,7 @@ public class PageGenerator {
             .forEach(widget -> {
                 List<ExecutableElement> publicMethods = getPublicMethods(widget);
                 if (!publicMethods.isEmpty() && !isAnnotated(widget, BaseWidget.class)) {
-                    widgets.add(new WidgetModel(widget.asType(), new ArrayList<>(publicMethods),
-                        widget.getSimpleName().toString())); //todo избавиться от WidgetAction из модели и дергать тип от TypeMirror
+                    widgets.add(new WidgetModel(widget.asType(), new ArrayList<>(publicMethods)));
                 } else {
                     widgets.forEach(allWidgets -> {
                         List<ExecutableElement> widgetMethods = allWidgets.getMethods();
@@ -120,10 +119,11 @@ public class PageGenerator {
     /*
     Метод для сохранения сгенерированных MethodSpec в каждый из объектов Page
      */
-    private void processMethodSpecsByAction(String widgetType, List<MethodSpec> methodSpecs, VariableElement field, Page page) {
+    private void processMethodSpecsByAction(String widgetType, List<MethodSpec> methodSpecs, VariableElement field,
+        Page page) {
 
         WidgetModel widget = page.getWidgets().stream()
-            .filter(currentWidget -> currentWidget.getWidgetAction().equals(widgetType))
+            .filter(currentWidget -> getWidgetType(currentWidget).equals(widgetType))
             .findFirst()
             .orElseThrow(() -> new RuntimeException("processMethodSpecsByAction"));
         widget.getMethods().forEach(method -> {
@@ -140,6 +140,15 @@ public class PageGenerator {
             }
         });
         page.setMethodSpecs(methodSpecs);
+    }
+
+    /*
+    Метод для получения типа виджета из пакета
+    test.model.Button -> Button
+     */
+    private String getWidgetType(WidgetModel model) {
+        return model.getType().toString()
+            .substring(model.getType().toString().lastIndexOf(".") + 1);
     }
 
     /*
@@ -167,6 +176,7 @@ public class PageGenerator {
     /*
     Метод для добавления всех методов из BaseWidget к остальным Widget'ам
      */
+    @Deprecated
     public void addBaseMethodsToEachWidget(Element baseElement, List<WidgetModel> widgets) {
         List<ExecutableElement> publicBaseElementMethods = getPublicMethods(baseElement);
         widgets.forEach(widget -> {
@@ -179,6 +189,7 @@ public class PageGenerator {
     /*
     Проверка наличия обязательной аннотации BaseWidget
      */
+    @Deprecated
     public Optional<Element> checkBaseWidget() {
         List<? extends Element> baseElements = this.roundEnv.getElementsAnnotatedWith(BaseWidget.class).stream()
             .toList();

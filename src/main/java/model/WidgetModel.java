@@ -15,6 +15,4 @@ public class WidgetModel {
 
     private TypeMirror type;
     private List<ExecutableElement> methods;
-    private String widgetAction;
-
 }
