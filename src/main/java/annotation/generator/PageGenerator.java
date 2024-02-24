@@ -1,6 +1,5 @@
 package annotation.generator;
 
-import static enums.WidgetAction.getActionByClassName;
 import static util.Utils.PACKAGE_NAME;
 import annotation.AutoGenPage;
 import annotation.BaseWidget;
@@ -9,12 +8,14 @@ import annotation.Widget;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
-import enums.WidgetAction;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
+import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
@@ -38,19 +39,47 @@ public class PageGenerator {
      */
     public List<WidgetModel> collectWidgets() {
         List<WidgetModel> widgets = new ArrayList<>();
+        roundEnv.getElementsAnnotatedWithAny(Set.of(Widget.class, BaseWidget.class))
+            .forEach(widget -> {
+                List<ExecutableElement> publicMethods = getPublicMethods(widget);
+                if (!publicMethods.isEmpty() && !isAnnotated(widget, BaseWidget.class)) {
+                    widgets.add(new WidgetModel(widget.asType(), new ArrayList<>(publicMethods),
+                        widget.getSimpleName().toString())); //todo избавиться от WidgetAction из модели и дергать тип от TypeMirror
+                } else {
+                    widgets.forEach(allWidgets -> {
+                        List<ExecutableElement> widgetMethods = allWidgets.getMethods();
+                        widgetMethods.addAll(publicMethods);
+                        allWidgets.setMethods(widgetMethods);
+                    });
+                }
+            });
+        return widgets;
+    }
 
-        for (Element widget : this.roundEnv.getElementsAnnotatedWith(Widget.class)) {
-
-            List<ExecutableElement> methods = getPublicMethods(widget);
-            if (!methods.isEmpty()) {
-                widgets.add(
-                    new WidgetModel(widget.asType(), new ArrayList<>(methods),
-                        getActionByClassName(widget.getSimpleName().toString())));
-            } else {
-                log.warn("no public methods in ", widget.getSimpleName());
+    /**
+     * Метод для проверки есть ли на классе специфическая аннотация
+     */
+    private boolean isAnnotated(Element element, Class<?> clazz) {
+        List<? extends AnnotationMirror> annotations = element.getAnnotationMirrors();
+        for (AnnotationMirror annotation : annotations) {
+            if (annotation.getAnnotationType().toString().equals(clazz.getName())) {
+                return true;
             }
         }
-        return widgets;
+        return false;
+    }
+
+    /*
+    К каждой page генерируется пачка методов на основе доступных Widget'ов
+    NB!!! необходимо добавлять новые case если появляются новые Widget'ы
+     */
+    public void generateMethodsToPage(List<Page> pages) {
+        pages.forEach(page -> {
+            List<MethodSpec> methodSpecs = new ArrayList<>();
+            page.getFields().forEach(field -> {
+                processMethodSpecsByAction(getWidgetFromField(field), methodSpecs, field, page);
+            });
+        });
     }
 
     /**
@@ -80,28 +109,21 @@ public class PageGenerator {
     }
 
     /*
-    К каждой page генерируется пачка методов на основе доступных Widget'ов
-    NB!!! необходимо добавлять новые case если появляются новые Widget'ы
-     */
-    public void generateMethodsToPage(List<Page> pages) {
-        pages.forEach(page -> {
-            List<MethodSpec> methodSpecs = new ArrayList<>();
-            page.getFields().forEach(field -> {
-                switch (WidgetAction.contains(field.getSimpleName().toString())) {
-                    case BUTTON -> processMethodSpecsByAction(WidgetAction.BUTTON, methodSpecs, field, page);
-                    case LABEL -> processMethodSpecsByAction(WidgetAction.LABEL, methodSpecs, field, page);
-                }
-            });
-        });
+    Метод для получения типа виджета из пейджи
+    */
+    private String getWidgetFromField(VariableElement field) {
+        return Arrays.stream(field.getSimpleName().toString().split("(?=[A-Z])"))
+            .reduce((head, tail) -> tail)
+            .orElse("Can't get widget type for field " + field.getSimpleName().toString()); //todo
     }
 
     /*
     Метод для сохранения сгенерированных MethodSpec в каждый из объектов Page
      */
-    private void processMethodSpecsByAction(WidgetAction action,
-        List<MethodSpec> methodSpecs, VariableElement field, Page page) {
+    private void processMethodSpecsByAction(String widgetType, List<MethodSpec> methodSpecs, VariableElement field, Page page) {
+
         WidgetModel widget = page.getWidgets().stream()
-            .filter(currentWidget -> currentWidget.getWidgetAction() == action)
+            .filter(currentWidget -> currentWidget.getWidgetAction().equals(widgetType))
             .findFirst()
             .orElseThrow(() -> new RuntimeException("processMethodSpecsByAction"));
         widget.getMethods().forEach(method -> {
@@ -121,7 +143,7 @@ public class PageGenerator {
     }
 
     /*
-    Метод для генерация всех классов на основе собранных объектов Page
+    Метод для генерации всех классов на основе собранных объектов Page
      */
     public List<TypeSpec> generateClasses(List<Page> pages) {
         // todo а почему нельзя методреференс где статика
@@ -182,6 +204,5 @@ public class PageGenerator {
         JavaFile.builder(PACKAGE_NAME, screenManagerSpec).build().writeTo(environment.getFiler());
 
     }
-
 
 }

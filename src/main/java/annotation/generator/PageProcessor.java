@@ -47,15 +47,6 @@ public class PageProcessor extends AbstractProcessor {
             log.warn("No widgets found");
             return true;
         }
-        //получили baseWidget
-        Optional<Element> baseElement = pageGenerator.checkBaseWidget();
-        if (baseElement.isEmpty()) {
-            log.warn("No Base widget found");
-            return true;
-        }
-
-        //добавление всех методов из baseElement к остальным widget'am
-        pageGenerator.addBaseMethodsToEachWidget(baseElement.get(), widgets);
 
         //собрали доступные PageObject'ы
         List<Page> pages = pageGenerator.collectPages(widgets);

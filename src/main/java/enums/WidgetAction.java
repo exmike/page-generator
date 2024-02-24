@@ -3,6 +3,7 @@ package enums;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
+@Deprecated
 @RequiredArgsConstructor
 public enum WidgetAction {
     BUTTON("button"),
