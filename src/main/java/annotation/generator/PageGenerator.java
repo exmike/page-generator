@@ -37,7 +37,7 @@ public class PageGenerator {
     /*
     Метод, который собирает все элементы проаннотированные Widget
      */
-    public List<WidgetModel> collectWidgets() {
+    public List<WidgetModel> collectWidgets() { //todo проверка единственного BaseWidget + что он просто есть
         List<WidgetModel> widgets = new ArrayList<>();
         roundEnv.getElementsAnnotatedWithAny(Set.of(Widget.class, BaseWidget.class))
             .forEach(widget -> {
@@ -108,12 +108,12 @@ public class PageGenerator {
     }
 
     /*
-    Метод для получения типа виджета из пейджи
+    Метод для получения типа виджета из филда пейджи
     */
     private String getWidgetFromField(VariableElement field) {
         return Arrays.stream(field.getSimpleName().toString().split("(?=[A-Z])"))
             .reduce((head, tail) -> tail)
-            .orElse("Can't get widget type for field " + field.getSimpleName().toString()); //todo
+            .get();
     }
 
     /*
@@ -125,7 +125,7 @@ public class PageGenerator {
         WidgetModel widget = page.getWidgets().stream()
             .filter(currentWidget -> getWidgetType(currentWidget).equals(widgetType))
             .findFirst()
-            .orElseThrow(() -> new RuntimeException("processMethodSpecsByAction"));
+            .orElseThrow(() -> new RuntimeException("Widget type mismatch"));
         widget.getMethods().forEach(method -> {
             if (method.getParameters().isEmpty() && method.getTypeParameters().isEmpty()) {
                 methodSpecs.add(specsCreator.getMethodSpecWithoutParams(method, field, page, widget).build());
