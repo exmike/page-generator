@@ -9,7 +9,9 @@ import io.appium.java_client.pagefactory.LocatorGroupStrategy;
 import io.appium.java_client.pagefactory.iOSXCUITFindBy;
 
 @PageObject
-public class ErrorScreen extends BaseScreen{
+public class ErrorScreen extends BaseScreen {
+
+    private SelenideAppiumElement backButton;
 
     @PageElementGen("Удалить")
     @HowToUseLocators(androidAutomation = LocatorGroupStrategy.ALL_POSSIBLE)
@@ -21,4 +23,9 @@ public class ErrorScreen extends BaseScreen{
     @AndroidFindBy(xpath = "xpath")
     @PageElementGen("кекЛейбл")
     private SelenideAppiumElement kekLabel;
+
+    @PageElementGen("Экран")
+    @iOSXCUITFindBy(iOSClassChain = "**/XCUIElementTypeNavigationBar/XCUIElementTypeButton")
+    @AndroidFindBy(xpath = "//android.widget.ImageButton[@content-desc='Navigate up']")
+    private SelenideAppiumElement view;
 }

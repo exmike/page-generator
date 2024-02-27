@@ -1,5 +1,6 @@
 package test.model;
 
+import annotation.Action;
 import annotation.Widget;
 import com.codeborne.selenide.appium.SelenideAppiumElement;
 
@@ -10,6 +11,7 @@ public class Button extends BaseElement {
         super(element);
     }
 
+    @Action(action = "Нажимаем на кнопку")
     public void click() {
         element.click();
     }

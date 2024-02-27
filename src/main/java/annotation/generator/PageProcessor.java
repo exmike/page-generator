@@ -5,7 +5,6 @@ import com.google.auto.service.AutoService;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Processor;
@@ -13,7 +12,6 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
-import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import lombok.SneakyThrows;
 import model.Page;
@@ -32,10 +30,10 @@ public class PageProcessor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         roundCount++;
         Logger log = new Logger(processingEnv.getMessager());
-        PageGenerator pageGenerator = new PageGenerator(log, roundEnv, new SpecsCreator());
+        PageGenerator pageGenerator = new PageGenerator(log, roundEnv, new SpecsCreator(), processingEnv);
 
         if (roundCount == 2) {
-            pageGenerator.generateScreenManager(processingEnv);
+            pageGenerator.generateScreenManager();
             return true;
         }
         if (roundCount > 2){
@@ -44,14 +42,14 @@ public class PageProcessor extends AbstractProcessor {
         //собрали доступные Widget'ы
         List<WidgetModel> widgets = pageGenerator.collectWidgets();
         if (widgets.isEmpty()) {
-            log.warn("No widgets found");
+            log.error("No widgets found");
             return true;
         }
 
         //собрали доступные PageObject'ы
         List<Page> pages = pageGenerator.collectPages(widgets);
         if (pages.isEmpty()) {
-            log.warn("No pages found");
+            log.error("No pages found");
             return true;
         }
         //сгенерировали для каждой Page методы
@@ -75,5 +73,6 @@ public class PageProcessor extends AbstractProcessor {
     - Подумать над скринами, которые инитятся внутри других скринов
     - *Добавить @Step к сгенеренным методам
     - *Добавить логгирование аналогичное собранному значению в @Step'e
+    - * ref to log className. actionValue + pageElementValue для каждой пейджи свой логгер
     - Помолиться
      */
