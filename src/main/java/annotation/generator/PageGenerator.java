@@ -20,6 +20,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
 import javax.lang.model.util.ElementFilter;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -39,6 +40,12 @@ public class PageGenerator {
      */
     public List<WidgetModel> collectWidgets() { //todo проверка единственного BaseWidget + что он просто есть
         List<WidgetModel> widgets = new ArrayList<>();
+
+        long baseWidget = roundEnv.getElementsAnnotatedWith(BaseWidget.class).stream().count();
+        if (baseWidget != 1) {
+            throw new RuntimeException("Expected to be 1 BaseWidget but was ");
+        }
+
         roundEnv.getElementsAnnotatedWithAny(Set.of(Widget.class, BaseWidget.class))
             .forEach(widget -> {
                 List<ExecutableElement> publicMethods = getPublicMethods(widget);
@@ -125,7 +132,7 @@ public class PageGenerator {
         WidgetModel widget = page.getWidgets().stream()
             .filter(currentWidget -> getWidgetType(currentWidget).equals(widgetType))
             .findFirst()
-            .orElseThrow(() -> new RuntimeException("Widget type mismatch"));
+            .orElseThrow(() -> new RuntimeException("Widget type mismatch")); //todo прокинуть диффы (expected but was)
         widget.getMethods().forEach(method -> {
             if (method.getParameters().isEmpty() && method.getTypeParameters().isEmpty()) {
                 methodSpecs.add(specsCreator.getMethodSpecWithoutParams(method, field, page, widget).build());
@@ -147,8 +154,7 @@ public class PageGenerator {
     test.model.Button -> Button
      */
     private String getWidgetType(WidgetModel model) {
-        return model.getType().toString()
-            .substring(model.getType().toString().lastIndexOf(".") + 1);
+        return (((DeclaredType) model.getType()).asElement()).getSimpleName().toString();
     }
 
     /*
