@@ -12,7 +12,6 @@ public class LoginScreen extends BaseScreen{
     @AndroidFindBy(xpath = "xpath")
     private SelenideAppiumElement likeButton;
 
-
     @AndroidFindBy(xpath = "xpath")
     @PageElementGen(value = "тайтл")
     private SelenideAppiumElement titleLabel;
