@@ -12,7 +12,7 @@ public class Label extends BaseElement {
         super(element);
     }
 
-    @Action
+    @Action(action = "checkvisible")
     public void checkVisible() {
         element.should(visible);
     }
