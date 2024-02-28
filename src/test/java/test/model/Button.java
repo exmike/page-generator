@@ -1,10 +1,10 @@
 package test.model;
 
 import annotation.Action;
-import annotation.Widget;
+import annotation.MobileElement;
 import com.codeborne.selenide.appium.SelenideAppiumElement;
 
-@Widget
+@MobileElement
 public class Button extends BaseElement {
 
     public Button(SelenideAppiumElement element) {
@@ -16,13 +16,8 @@ public class Button extends BaseElement {
         element.click();
     }
 
+    @Action(action = "Дважды нажимаем на кнопку")
     public void doubleClick() {
         element.doubleClick();
     }
-
-    public void tripleClick() {
-        element.doubleClick().click();
-    }
-
-
 }

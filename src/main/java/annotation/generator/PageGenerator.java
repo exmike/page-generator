@@ -1,13 +1,15 @@
 package annotation.generator;
 
 import static util.Utils.PACKAGE_NAME;
-import static util.Utils.getWidgetNameFromField;
-import static util.Utils.getWidgetTypeName;
+import static util.Utils.getMobileElementNameFromField;
+import static util.Utils.getMobileElementTypeName;
 import static util.Utils.isAnnotated;
+import annotation.Action;
 import annotation.AutoGenPage;
-import annotation.BaseWidget;
+import annotation.BaseMobileElement;
+import annotation.MobileElement;
+import annotation.PageElementGen;
 import annotation.PageObject;
-import annotation.Widget;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
@@ -23,8 +25,8 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementFilter;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
+import model.MobileElementModel;
 import model.Page;
-import model.WidgetModel;
 import org.apache.commons.lang3.StringUtils;
 import util.Logger;
 
@@ -36,35 +38,37 @@ public class PageGenerator {
     private SpecsCreator specsCreator;
     private ProcessingEnvironment processingEnvironment;
 
-    /*
-    Метод, который собирает все элементы проаннотированные Widget
+    /**
+     * Метод, который собирает все элементы проаннотированные MobileElement
      */
-    public List<WidgetModel> collectWidgets() {
-        List<WidgetModel> widgets = new ArrayList<>();
+    public List<MobileElementModel> collectMobileElements() {
+        List<MobileElementModel> mobileElements = new ArrayList<>();
 
-        long baseWidget = roundEnv.getElementsAnnotatedWith(BaseWidget.class).size();
-        if (baseWidget != 1) {
-            throw new RuntimeException("Ожидается, что будет одна аннотация BaseWidget но их: " + baseWidget);
+        long baseMobileElement = roundEnv.getElementsAnnotatedWith(BaseMobileElement.class).size();
+        if (baseMobileElement != 1) {
+            throw new RuntimeException(
+                "Ожидается, что будет одна аннотация BaseMobileElement но их: " + baseMobileElement);
         }
 
-        roundEnv.getElementsAnnotatedWithAny(Set.of(Widget.class, BaseWidget.class))
-            .forEach(widget -> {
-                List<ExecutableElement> publicMethods = getPublicMethods(widget);
-                if (!isAnnotated(widget, BaseWidget.class)) {
-                    widgets.add(new WidgetModel(widget.asType(), new ArrayList<>(publicMethods)));
+        roundEnv.getElementsAnnotatedWithAny(Set.of(MobileElement.class, BaseMobileElement.class))
+            .forEach(element -> {
+                List<ExecutableElement> publicMethods = getPublicMethods(element);
+                checkCorrectMethods(publicMethods);
+                if (!isAnnotated(element, BaseMobileElement.class)) {
+                    mobileElements.add(new MobileElementModel(element.asType(), new ArrayList<>(publicMethods)));
                 } else {
-                    widgets.forEach(allWidgets -> {
-                        List<ExecutableElement> widgetMethods = allWidgets.getMethods();
-                        widgetMethods.addAll(publicMethods);
-                        allWidgets.setMethods(widgetMethods);
+                    mobileElements.forEach(mobileElement -> {
+                        List<ExecutableElement> elementMethods = mobileElement.getMethods();
+                        elementMethods.addAll(publicMethods);
+                        mobileElement.setMethods(elementMethods);
                     });
                 }
             });
-        return widgets;
+        return mobileElements;
     }
 
     /*
-    К каждой page генерируется пачка методов на основе доступных Widget'ов
+    К каждой page генерируется пачка методов на основе доступных MobileElement'ов
      */
     public void generateMethodsToPage(List<Page> pages) {
         pages.forEach(page -> page.getFields().forEach(field -> processMethodSpecsByAction(field, page)));
@@ -73,55 +77,78 @@ public class PageGenerator {
     /**
      * Метод собирает все пейджы, которые проаннотированны PageObject'ом, собирая public поля находящиеся в них
      */
-    public List<Page> collectPages(List<WidgetModel> widgets) {
+    public List<Page> collectPages(List<MobileElementModel> mobileElements) {
         List<Page> pages = new ArrayList<>();
 
         for (Element page : this.roundEnv.getElementsAnnotatedWith(PageObject.class)) {
             List<VariableElement> fields = ElementFilter.fieldsIn(page.getEnclosedElements());
-            //todo проверка что на филде есть аннотация PageElement и она не пустая
-            //проверка что поля в PageObject'ах имеют модификатор private
-            List<VariableElement> notPrivateField = fields.stream()
-                .filter(field -> !field.getModifiers().contains(Modifier.PRIVATE))
-                .toList();
-            if (!notPrivateField.isEmpty()) {
-                notPrivateField.forEach(
-                    variableElement -> log.error("Поле %s в классе %s должно быть private, а не %s ",
-                        variableElement.toString(), page.getSimpleName(), variableElement.getModifiers()));
-            }
+            checkCorrectFields(fields, page);
 
             log.debug(page.getSimpleName() + " поля: " + fields);
-
-            pages.add(new Page(page.getSimpleName().toString() + "Gen", fields, widgets));
+            pages.add(new Page(page.getSimpleName().toString() + "Gen", fields, mobileElements));
         }
         return pages;
+    }
+
+    private void checkCorrectFields(List<? extends Element> elements, Element page) {
+        elements.forEach(field -> {
+            if (!isAnnotated(field, PageElementGen.class)) {
+                throw new RuntimeException(String.format("Поле %s в классе %s должно быть c аннотацией PageElement",
+                    field, page.getSimpleName()));
+            }
+
+            if (field.getAnnotation(PageElementGen.class).value().isEmpty()) {
+                throw new RuntimeException(
+                    String.format("Поле %s в классе %s в аннотации PageElement должно иметь не пустое значение",
+                        field, page.getSimpleName())
+                );
+            }
+        });
+    }
+
+    private void checkCorrectMethods(List<? extends Element> elements) {
+        elements.forEach(method -> {
+            if (!isAnnotated(method, Action.class)) {
+                throw new RuntimeException(
+                    String.format("Метод с названием %s в классе %s должен быть с аннотацией Action",
+                        method.getSimpleName(), method.getEnclosingElement().getSimpleName().toString()));
+            }
+
+            if (method.getAnnotation(Action.class).action().isEmpty()) {
+                throw new RuntimeException(
+                    String.format("Метод с названием %s в классе %s в аннотации Action должно иметь не пустое значение",
+                        method.getSimpleName(), method.getEnclosingElement().getSimpleName().toString())
+                );
+            }
+        });
     }
 
     /*
     Метод для сохранения сгенерированных MethodSpec в каждый из объектов Page
      */
     private void processMethodSpecsByAction(VariableElement field, Page page) {
-        String widgetTypeNameFromField = getWidgetNameFromField(field);
+        String elementTypeNameFromField = getMobileElementNameFromField(field);
 
-        WidgetModel widget = page.getWidgets().stream()
-            .filter(currentWidget -> StringUtils.containsIgnoreCase(widgetTypeNameFromField,
-                getWidgetTypeName(currentWidget)))
+        MobileElementModel element = page.getMobileElements().stream()
+            .filter(currentElement -> StringUtils.containsIgnoreCase(elementTypeNameFromField,
+                getMobileElementTypeName(currentElement)))
             .findFirst()
             .orElseThrow(() -> new RuntimeException(
                 String.format("У поля %s в классе %s не смогли определить тип, доступные типы: %s",
-                    field.getSimpleName().toString(), page.getPageName(), page.getStringWidgets())));
+                    field.getSimpleName().toString(), page.getPageName(), page.getStringMobileElements())));
 
         //todo rework
-        widget.getMethods().forEach(method -> {
+        element.getMethods().forEach(method -> {
             if (method.getParameters().isEmpty() && method.getTypeParameters().isEmpty()) {
-                page.addSpec(specsCreator.getMethodSpecWithoutParams(method, field, page, widget).build());
+                page.addSpec(specsCreator.getMethodSpecWithoutParams(method, field, page, element).build());
                 return;
             }
             if (!method.getTypeParameters().isEmpty()) {
-                page.addSpec(specsCreator.getMethodSpecWithTypeParams(method, field, page, widget).build());
+                page.addSpec(specsCreator.getMethodSpecWithTypeParams(method, field, page, element).build());
                 return;
             }
             if (!method.getParameters().isEmpty()) {
-                page.addSpec(specsCreator.getMethodSpecWithParams(method, field, page, widget).build());
+                page.addSpec(specsCreator.getMethodSpecWithParams(method, field, page, element).build());
             }
         });
     }
@@ -130,17 +157,16 @@ public class PageGenerator {
     Метод для генерации всех классов на основе собранных объектов Page
      */
     public List<TypeSpec> generateClasses(List<Page> pages) {
-        // todo а почему нельзя методреференс где статика
         return pages.stream()
-            .map(page -> specsCreator.getTypeSpecFromPage(page))
+            .map(specsCreator::getTypeSpecFromPage)
             .toList();
     }
 
     /*
     Получение всех публичных методов из виджета
      */
-    private List<ExecutableElement> getPublicMethods(Element widget) {
-        return ElementFilter.methodsIn(widget.getEnclosedElements())
+    private List<ExecutableElement> getPublicMethods(Element mobileElement) {
+        return ElementFilter.methodsIn(mobileElement.getEnclosedElements())
             .stream()
             .filter(method -> method.getModifiers().contains(Modifier.PUBLIC))
             .toList();

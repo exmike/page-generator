@@ -7,11 +7,12 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
-import model.WidgetModel;
+import model.MobileElementModel;
 
 public class Utils {
 
-    public static String PACKAGE_NAME = "page.generated";
+    public static final String PACKAGE_NAME = "page.generated";
+    public static final String WHITESPACE = " ";
 
     //todo mb rework
     //[aboba],[kek] -> aboba, kek
@@ -38,14 +39,14 @@ public class Utils {
     /**
      * Метод для получения типа виджета из пакета test.model.Button -> Button
      */
-    public static String getWidgetTypeName(WidgetModel model) {
+    public static String getMobileElementTypeName(MobileElementModel model) {
         return (((DeclaredType) model.getType()).asElement()).getSimpleName().toString();
     }
 
     /*
     Метод для получения типа виджета из филда пейджи titleLabel -> Label
     */
-    public static String getWidgetNameFromField(VariableElement field) {
+    public static String getMobileElementNameFromField(VariableElement field) {
         return Arrays.stream(field.getSimpleName().toString().split("(?=[A-Z])"))
             .reduce((head, tail) -> tail)
             .get();

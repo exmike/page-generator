@@ -1,7 +1,10 @@
 package annotation.generator;
 
 import static util.Utils.PACKAGE_NAME;
+import static util.Utils.WHITESPACE;
+import annotation.Action;
 import annotation.AutoGenPage;
+import annotation.PageElementGen;
 import com.codeborne.selenide.appium.ScreenObject;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
@@ -11,6 +14,7 @@ import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
+import io.qameta.allure.Step;
 import java.util.List;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
@@ -18,7 +22,7 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
 import model.Page;
-import model.WidgetModel;
+import model.MobileElementModel;
 import org.apache.commons.lang3.StringUtils;
 import util.Utils;
 
@@ -40,27 +44,27 @@ public class SpecsCreator {
     Метод для генерации новых методов
      */
     public MethodSpec.Builder getMethodSpecWithoutParams(ExecutableElement method, VariableElement field, Page page,
-        WidgetModel widget) {
+        MobileElementModel mobileElement) {
         return defaultMethodSpecBuilder(method, field, page)
             .addStatement(
-                "new $T(" + field.getSimpleName() + ")." + method.getSimpleName() + "()", widget.getType())
+                "new $T(" + field.getSimpleName() + ")." + method.getSimpleName() + "()", mobileElement.getType())
             .addStatement("return this");
     }
 
     public MethodSpec.Builder getMethodSpecWithParams(ExecutableElement method, VariableElement field, Page page,
-        WidgetModel widget) {
+        MobileElementModel mobileElement) {
         List<ParameterSpec> parameterSpecs = paramSpec(method);
         return defaultMethodSpecBuilder(method, field, page)
             .addParameters(parameterSpecs)
             .addStatement(
                 "new $T(" + field.getSimpleName() + ")." + method.getSimpleName() +
-                    "(" + Utils.formatParamListToString(parameterSpecs) + ")", widget.getType())
+                    "(" + Utils.formatParamListToString(parameterSpecs) + ")", mobileElement.getType())
             .addStatement("return this");
     }
 
     public MethodSpec.Builder getMethodSpecWithTypeParams(ExecutableElement method, VariableElement field, Page page,
-        WidgetModel widget) {
-        return getMethodSpecWithParams(method, field, page, widget)
+        MobileElementModel mobileElement) {
+        return getMethodSpecWithParams(method, field, page, mobileElement)
             .addTypeVariables(getTypeParamsFromMethod(method.getTypeParameters()));
     }
 
@@ -108,14 +112,24 @@ public class SpecsCreator {
             .toList();
     }
 
-
     private MethodSpec.Builder defaultMethodSpecBuilder(ExecutableElement method, VariableElement field, Page page) {
         return MethodSpec.methodBuilder(
                 field.getSimpleName().toString() + "_" + method.getSimpleName().toString())
             .addModifiers(Modifier.PUBLIC)
+            .addAnnotation(stepAnnotationSpec(method, field, page))
             .returns(ClassName.get(PACKAGE_NAME, page.getPageName()));
     }
 
+    /*
+    Собирает Аннотацию @Step со значением 'pageName methodAction fieldValue'
+     */
+    private AnnotationSpec stepAnnotationSpec(ExecutableElement method, VariableElement field, Page page) {
+        return AnnotationSpec.builder(Step.class)
+            .addMember("value", "$S",
+                page.getPageName() + WHITESPACE + method.getAnnotation(Action.class).action() +
+                    WHITESPACE + field.getAnnotation(PageElementGen.class).value())
+            .build();
+    }
 
     public static MethodSpec generateScreenMethods(Element element) {
         return MethodSpec.methodBuilder(StringUtils.uncapitalize(element.getSimpleName().toString()))

@@ -1,6 +1,7 @@
 package model;
 
-import static util.Utils.getWidgetTypeName;
+import static util.Utils.WHITESPACE;
+import static util.Utils.getMobileElementTypeName;
 import com.squareup.javapoet.MethodSpec;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,21 +12,21 @@ import lombok.Data;
 public class Page {
 
     private String pageName;
-    private List<WidgetModel> widgets;
+    private List<MobileElementModel> mobileElements;
     private List<VariableElement> fields;
     private List<MethodSpec> methodSpecs;
 
-    public Page(String pageName, List<VariableElement> fields, List<WidgetModel> widgets) {
+    public Page(String pageName, List<VariableElement> fields, List<MobileElementModel> mobileElements) {
         this.pageName = pageName;
         this.fields = fields;
-        this.widgets = widgets;
+        this.mobileElements = mobileElements;
         this.methodSpecs = new ArrayList<>();
     }
 
-    public String getStringWidgets() {
+    public String getStringMobileElements() {
         StringBuilder sb = new StringBuilder();
-        for (WidgetModel widget : this.widgets) {
-            sb.append(getWidgetTypeName(widget)).append(" ");
+        for (MobileElementModel element : this.mobileElements) {
+            sb.append(getMobileElementTypeName(element)).append(WHITESPACE);
         }
         return sb.toString();
     }
@@ -33,5 +34,4 @@ public class Page {
     public void addSpec(MethodSpec methodSpec) {
         this.methodSpecs.add(methodSpec);
     }
-
 }

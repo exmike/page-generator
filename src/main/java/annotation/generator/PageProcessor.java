@@ -15,7 +15,7 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
 import lombok.SneakyThrows;
 import model.Page;
-import model.WidgetModel;
+import model.MobileElementModel;
 import util.Logger;
 
 @SupportedAnnotationTypes("annotation.*")
@@ -36,21 +36,20 @@ public class PageProcessor extends AbstractProcessor {
             pageGenerator.generateScreenManager();
             return true;
         }
-        if (roundCount > 2){
-            return true;
-        }
-        //собрали доступные Widget'ы
-        List<WidgetModel> widgets = pageGenerator.collectWidgets();
-        if (widgets.isEmpty()) {
-            log.error("No widgets found");
+        if (roundCount > 2) {
             return true;
         }
 
+        //собрали доступные MobileElement'ы
+        List<MobileElementModel> mobileElements = pageGenerator.collectMobileElements();
+        if (mobileElements.isEmpty()) {
+            throw new RuntimeException("Не нашли классов аннотированных MobileElement");
+        }
+
         //собрали доступные PageObject'ы
-        List<Page> pages = pageGenerator.collectPages(widgets);
+        List<Page> pages = pageGenerator.collectPages(mobileElements);
         if (pages.isEmpty()) {
-            log.error("No pages found");
-            return true;
+            throw new RuntimeException("Не нашли классов аннотированных PageObject");
         }
         //сгенерировали для каждой Page методы
         pageGenerator.generateMethodsToPage(pages);
@@ -71,8 +70,6 @@ public class PageProcessor extends AbstractProcessor {
     - Нужен механизм для генерации методов в определенные пейджи на основе полей из BaseScreen
     - Нужен механизм для возможности итераций по раундам (kek done try to rework)
     - Подумать над скринами, которые инитятся внутри других скринов
-    - *Добавить @Step к сгенеренным методам
-    - *Добавить логгирование аналогичное собранному значению в @Step'e
-    - * ref to log className. actionValue + pageElementValue для каждой пейджи свой логгер
+    - *Добавить логгирование аналогичное собранному значению в @Step'e (доработать StepListener в проекте)
     - Помолиться
      */

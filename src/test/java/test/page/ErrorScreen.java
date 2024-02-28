@@ -11,8 +11,6 @@ import io.appium.java_client.pagefactory.iOSXCUITFindBy;
 @PageObject
 public class ErrorScreen extends BaseScreen {
 
-    private SelenideAppiumElement backButton;
-
     @PageElementGen("Удалить")
     @HowToUseLocators(androidAutomation = LocatorGroupStrategy.ALL_POSSIBLE)
     @iOSXCUITFindBy(iOSClassChain = "**/XCUIElementTypeNavigationBar/XCUIElementTypeButton")
