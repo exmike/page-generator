@@ -131,7 +131,7 @@ public class SpecsCreator {
             .build();
     }
 
-    public static MethodSpec generateScreenMethods(Element element) {
+    public MethodSpec generateScreenMethods(Element element) {
         return MethodSpec.methodBuilder(StringUtils.uncapitalize(element.getSimpleName().toString()))
             .addModifiers(Modifier.PUBLIC)
             .returns(ClassName.get(PACKAGE_NAME, element.getSimpleName().toString()))

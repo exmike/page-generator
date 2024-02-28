@@ -1,6 +1,7 @@
 package util;
 
 import com.squareup.javapoet.ParameterSpec;
+import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.List;
 import javax.lang.model.element.AnnotationMirror;
@@ -27,7 +28,7 @@ public class Utils {
     /**
      * Метод для проверки есть ли на классе специфическая аннотация
      */
-    public static boolean isAnnotated(Element element, Class<?> clazz) {
+    public static boolean isAnnotated(Element element, Class<? extends Annotation> clazz) {
         for (AnnotationMirror annotation : element.getAnnotationMirrors()) {
             if (annotation.getAnnotationType().toString().equals(clazz.getName())) {
                 return true;

@@ -13,6 +13,7 @@ import annotation.PageObject;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -23,32 +24,31 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementFilter;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import model.MobileElementModel;
 import model.Page;
 import org.apache.commons.lang3.StringUtils;
 import util.Logger;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class PageGenerator {
 
-    private Logger log;
-    private RoundEnvironment roundEnv;
-    private SpecsCreator specsCreator;
-    private ProcessingEnvironment processingEnvironment;
+    private final Logger log;
+    private final RoundEnvironment roundEnv;
+    private final SpecsCreator specsCreator;
+    private final ProcessingEnvironment processingEnvironment;
+
+    private List<MobileElementModel> mobileElements;
+    private List<Page> pages;
 
     /**
-     * Метод, который собирает все элементы проаннотированные MobileElement
+     * Метод, который собирает все элементы проаннотированные MobileElement и к каждому MobileElement добавляет все
+     * методы из BaseMobileElement
      */
-    public List<MobileElementModel> collectMobileElements() {
+    public PageGenerator collectMobileElements() {
+        validateBaseMobileElement();
         List<MobileElementModel> mobileElements = new ArrayList<>();
-
-        long baseMobileElement = roundEnv.getElementsAnnotatedWith(BaseMobileElement.class).size();
-        if (baseMobileElement != 1) {
-            throw new RuntimeException(
-                "Ожидается, что будет одна аннотация BaseMobileElement но их: " + baseMobileElement);
-        }
 
         roundEnv.getElementsAnnotatedWithAny(Set.of(MobileElement.class, BaseMobileElement.class))
             .forEach(element -> {
@@ -57,37 +57,36 @@ public class PageGenerator {
                 if (!isAnnotated(element, BaseMobileElement.class)) {
                     mobileElements.add(new MobileElementModel(element.asType(), new ArrayList<>(publicMethods)));
                 } else {
-                    mobileElements.forEach(mobileElement -> {
-                        List<ExecutableElement> elementMethods = mobileElement.getMethods();
-                        elementMethods.addAll(publicMethods);
-                        mobileElement.setMethods(elementMethods);
-                    });
+                    mobileElements.forEach(mobileElement -> mobileElement.getMethods().addAll(publicMethods));
                 }
             });
-        return mobileElements;
+        validate(mobileElements, MobileElement.class);
+        this.mobileElements = mobileElements;
+        return this;
     }
 
     /*
     К каждой page генерируется пачка методов на основе доступных MobileElement'ов
      */
-    public void generateMethodsToPage(List<Page> pages) {
-        pages.forEach(page -> page.getFields().forEach(field -> processMethodSpecsByAction(field, page)));
+    public PageGenerator generateMethodsToPage() {
+        this.pages.forEach(page -> page.getFields().forEach(field -> processMethodSpecsByAction(field, page)));
+        return this;
     }
 
     /**
      * Метод собирает все пейджы, которые проаннотированны PageObject'ом, собирая public поля находящиеся в них
      */
-    public List<Page> collectPages(List<MobileElementModel> mobileElements) {
-        List<Page> pages = new ArrayList<>();
-
-        for (Element page : this.roundEnv.getElementsAnnotatedWith(PageObject.class)) {
-            List<VariableElement> fields = ElementFilter.fieldsIn(page.getEnclosedElements());
-            checkCorrectFields(fields, page);
-
-            log.debug(page.getSimpleName() + " поля: " + fields);
-            pages.add(new Page(page.getSimpleName().toString() + "Gen", fields, mobileElements));
-        }
-        return pages;
+    public PageGenerator collectPages() {
+        List<Page> pages = this.roundEnv.getElementsAnnotatedWith(PageObject.class)
+            .stream()
+            .map(page -> {
+                List<VariableElement> fields = ElementFilter.fieldsIn(page.getEnclosedElements());
+                checkCorrectFields(fields, page);
+                return new Page(page.getSimpleName().toString() + "Gen", fields, this.mobileElements);
+            }).toList();
+        validate(pages, PageObject.class);
+        this.pages = pages;
+        return this;
     }
 
     private void checkCorrectFields(List<? extends Element> elements, Element page) {
@@ -156,8 +155,8 @@ public class PageGenerator {
     /*
     Метод для генерации всех классов на основе собранных объектов Page
      */
-    public List<TypeSpec> generateClasses(List<Page> pages) {
-        return pages.stream()
+    public List<TypeSpec> generateClasses() {
+        return this.pages.stream()
             .map(specsCreator::getTypeSpecFromPage)
             .toList();
     }
@@ -174,8 +173,9 @@ public class PageGenerator {
 
     @SneakyThrows
     public void generateScreenManager() {
-        List<MethodSpec> methodSpecs = this.roundEnv.getElementsAnnotatedWith(AutoGenPage.class).stream()
-            .map(SpecsCreator::generateScreenMethods)
+        List<MethodSpec> methodSpecs = this.roundEnv.getElementsAnnotatedWith(AutoGenPage.class)
+            .stream()
+            .map(specsCreator::generateScreenMethods)
             .toList();
 
         TypeSpec screenManagerSpec = TypeSpec.classBuilder("ScreenManagerGen")
@@ -183,5 +183,39 @@ public class PageGenerator {
             .addMethods(methodSpecs)
             .build();
         JavaFile.builder(PACKAGE_NAME, screenManagerSpec).build().writeTo(this.processingEnvironment.getFiler());
+    }
+
+    /*
+    Основной метод для поэтапной генерации классов
+     */
+    public void generatePages() {
+        //собрали доступные MobileElement'ы
+        this.collectMobileElements()
+            //собрали доступные PageObject'ы
+            .collectPages()
+            //сгенерировали для каждой Page методы
+            .generateMethodsToPage()
+            //сгенерировали классы на основе ранее сгенерированных pages и записал их в Filer
+            .generateClasses()
+            .forEach(this::writeClass);
+    }
+
+    @SneakyThrows
+    private void writeClass(TypeSpec typeSpec) {
+        JavaFile.builder(PACKAGE_NAME, typeSpec).build().writeTo(this.processingEnvironment.getFiler());
+    }
+
+    private <T> void validate(List<T> elements, Class<? extends Annotation> annotation) {
+        if (elements.isEmpty()) {
+            throw new RuntimeException("Не нашли классов аннотированных " + annotation.getSimpleName());
+        }
+    }
+
+    private void validateBaseMobileElement() {
+        long baseMobileElement = roundEnv.getElementsAnnotatedWith(BaseMobileElement.class).size();
+        if (baseMobileElement != 1) {
+            throw new RuntimeException(
+                "Ожидается, что будет одна аннотация BaseMobileElement но их: " + baseMobileElement);
+        }
     }
 }

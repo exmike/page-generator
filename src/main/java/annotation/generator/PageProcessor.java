@@ -1,10 +1,6 @@
 package annotation.generator;
 
-import static util.Utils.PACKAGE_NAME;
 import com.google.auto.service.AutoService;
-import com.squareup.javapoet.JavaFile;
-import com.squareup.javapoet.TypeSpec;
-import java.util.List;
 import java.util.Set;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Processor;
@@ -13,9 +9,6 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
-import lombok.SneakyThrows;
-import model.Page;
-import model.MobileElementModel;
 import util.Logger;
 
 @SupportedAnnotationTypes("annotation.*")
@@ -23,12 +16,15 @@ import util.Logger;
 @AutoService(Processor.class)
 public class PageProcessor extends AbstractProcessor {
 
+    private static final int MAX_ROUNDS = 2;
     private int roundCount = 0;
 
     @Override
-    @SneakyThrows
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         roundCount++;
+        if (roundCount > MAX_ROUNDS) {
+            return true;
+        }
         Logger log = new Logger(processingEnv.getMessager());
         PageGenerator pageGenerator = new PageGenerator(log, roundEnv, new SpecsCreator(), processingEnv);
 
@@ -36,31 +32,8 @@ public class PageProcessor extends AbstractProcessor {
             pageGenerator.generateScreenManager();
             return true;
         }
-        if (roundCount > 2) {
-            return true;
-        }
 
-        //собрали доступные MobileElement'ы
-        List<MobileElementModel> mobileElements = pageGenerator.collectMobileElements();
-        if (mobileElements.isEmpty()) {
-            throw new RuntimeException("Не нашли классов аннотированных MobileElement");
-        }
-
-        //собрали доступные PageObject'ы
-        List<Page> pages = pageGenerator.collectPages(mobileElements);
-        if (pages.isEmpty()) {
-            throw new RuntimeException("Не нашли классов аннотированных PageObject");
-        }
-        //сгенерировали для каждой Page методы
-        pageGenerator.generateMethodsToPage(pages);
-
-        //сгенерировали классы на основе ранее сгенерированных pages
-        List<TypeSpec> specs = pageGenerator.generateClasses(pages);
-
-        //записали классы в filer
-        for (TypeSpec spec : specs) {
-            JavaFile.builder(PACKAGE_NAME, spec).build().writeTo(processingEnv.getFiler());
-        }
+        pageGenerator.generatePages();
         return true;
     }
 }
