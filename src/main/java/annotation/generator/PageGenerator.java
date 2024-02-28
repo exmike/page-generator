@@ -1,19 +1,19 @@
 package annotation.generator;
 
 import static util.Utils.PACKAGE_NAME;
+import static util.Utils.checkCorrectFields;
+import static util.Utils.checkCorrectMethods;
 import static util.Utils.getMobileElementNameFromField;
 import static util.Utils.getMobileElementTypeName;
-import static util.Utils.isAnnotated;
-import annotation.Action;
+import static util.Utils.isNotAnnotated;
+import static util.Utils.validate;
 import annotation.AutoGenPage;
 import annotation.BaseMobileElement;
 import annotation.MobileElement;
-import annotation.PageElementGen;
 import annotation.PageObject;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
-import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -54,7 +54,7 @@ public class PageGenerator {
             .forEach(element -> {
                 List<ExecutableElement> publicMethods = getPublicMethods(element);
                 checkCorrectMethods(publicMethods);
-                if (!isAnnotated(element, BaseMobileElement.class)) {
+                if (isNotAnnotated(element, BaseMobileElement.class)) {
                     mobileElements.add(new MobileElementModel(element.asType(), new ArrayList<>(publicMethods)));
                 } else {
                     mobileElements.forEach(mobileElement -> mobileElement.getMethods().addAll(publicMethods));
@@ -69,7 +69,7 @@ public class PageGenerator {
     К каждой page генерируется пачка методов на основе доступных MobileElement'ов
      */
     public PageGenerator generateMethodsToPage() {
-        this.pages.forEach(page -> page.getFields().forEach(field -> processMethodSpecsByAction(field, page)));
+        this.pages.forEach(page -> page.getFields().forEach(field -> generateMethodSpecToPage(field, page)));
         return this;
     }
 
@@ -89,43 +89,10 @@ public class PageGenerator {
         return this;
     }
 
-    private void checkCorrectFields(List<? extends Element> elements, Element page) {
-        elements.forEach(field -> {
-            if (!isAnnotated(field, PageElementGen.class)) {
-                throw new RuntimeException(String.format("Поле %s в классе %s должно быть c аннотацией PageElement",
-                    field, page.getSimpleName()));
-            }
-
-            if (field.getAnnotation(PageElementGen.class).value().isEmpty()) {
-                throw new RuntimeException(
-                    String.format("Поле %s в классе %s в аннотации PageElement должно иметь не пустое значение",
-                        field, page.getSimpleName())
-                );
-            }
-        });
-    }
-
-    private void checkCorrectMethods(List<? extends Element> elements) {
-        elements.forEach(method -> {
-            if (!isAnnotated(method, Action.class)) {
-                throw new RuntimeException(
-                    String.format("Метод с названием %s в классе %s должен быть с аннотацией Action",
-                        method.getSimpleName(), method.getEnclosingElement().getSimpleName().toString()));
-            }
-
-            if (method.getAnnotation(Action.class).action().isEmpty()) {
-                throw new RuntimeException(
-                    String.format("Метод с названием %s в классе %s в аннотации Action должно иметь не пустое значение",
-                        method.getSimpleName(), method.getEnclosingElement().getSimpleName().toString())
-                );
-            }
-        });
-    }
-
     /*
     Метод для сохранения сгенерированных MethodSpec в каждый из объектов Page
      */
-    private void processMethodSpecsByAction(VariableElement field, Page page) {
+    private void generateMethodSpecToPage(VariableElement field, Page page) {
         String elementTypeNameFromField = getMobileElementNameFromField(field);
 
         MobileElementModel element = page.getMobileElements().stream()
@@ -140,13 +107,11 @@ public class PageGenerator {
         element.getMethods().forEach(method -> {
             if (method.getParameters().isEmpty() && method.getTypeParameters().isEmpty()) {
                 page.addSpec(specsCreator.getMethodSpecWithoutParams(method, field, page, element).build());
-                return;
             }
-            if (!method.getTypeParameters().isEmpty()) {
+            else if (!method.getTypeParameters().isEmpty()) {
                 page.addSpec(specsCreator.getMethodSpecWithTypeParams(method, field, page, element).build());
-                return;
             }
-            if (!method.getParameters().isEmpty()) {
+            else if (!method.getParameters().isEmpty()) {
                 page.addSpec(specsCreator.getMethodSpecWithParams(method, field, page, element).build());
             }
         });
@@ -182,7 +147,7 @@ public class PageGenerator {
             .addModifiers(Modifier.PUBLIC)
             .addMethods(methodSpecs)
             .build();
-        JavaFile.builder(PACKAGE_NAME, screenManagerSpec).build().writeTo(this.processingEnvironment.getFiler());
+        this.writeClass(screenManagerSpec);
     }
 
     /*
@@ -205,17 +170,14 @@ public class PageGenerator {
         JavaFile.builder(PACKAGE_NAME, typeSpec).build().writeTo(this.processingEnvironment.getFiler());
     }
 
-    private <T> void validate(List<T> elements, Class<? extends Annotation> annotation) {
-        if (elements.isEmpty()) {
-            throw new RuntimeException("Не нашли классов аннотированных " + annotation.getSimpleName());
-        }
-    }
-
+    /*
+    Проверка наличия BaseMobileElement в единственном экземпляре
+     */
     private void validateBaseMobileElement() {
-        long baseMobileElement = roundEnv.getElementsAnnotatedWith(BaseMobileElement.class).size();
-        if (baseMobileElement != 1) {
+        long baseMobileElementCount = roundEnv.getElementsAnnotatedWith(BaseMobileElement.class).size();
+        if (baseMobileElementCount != 1) {
             throw new RuntimeException(
-                "Ожидается, что будет одна аннотация BaseMobileElement но их: " + baseMobileElement);
+                "Ожидается, что будет одна аннотация BaseMobileElement но их: " + baseMobileElementCount);
         }
     }
 }

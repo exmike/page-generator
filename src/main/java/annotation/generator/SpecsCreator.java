@@ -41,7 +41,7 @@ public class SpecsCreator {
     }
 
     /*
-    Метод для генерации новых методов
+    Генерирует метод спеку без параметров
      */
     public MethodSpec.Builder getMethodSpecWithoutParams(ExecutableElement method, VariableElement field, Page page,
         MobileElementModel mobileElement) {
@@ -51,6 +51,9 @@ public class SpecsCreator {
             .addStatement("return this");
     }
 
+    /*
+    Генерирует метод спеку с параметрами
+     */
     public MethodSpec.Builder getMethodSpecWithParams(ExecutableElement method, VariableElement field, Page page,
         MobileElementModel mobileElement) {
         List<ParameterSpec> parameterSpecs = paramSpec(method);
@@ -62,10 +65,22 @@ public class SpecsCreator {
             .addStatement("return this");
     }
 
+    /*
+    Генерирует метод спеку с <TYPE> параметрами
+     */
     public MethodSpec.Builder getMethodSpecWithTypeParams(ExecutableElement method, VariableElement field, Page page,
         MobileElementModel mobileElement) {
         return getMethodSpecWithParams(method, field, page, mobileElement)
             .addTypeVariables(getTypeParamsFromMethod(method.getTypeParameters()));
+    }
+
+
+    private MethodSpec.Builder defaultMethodSpecBuilder(ExecutableElement method, VariableElement field, Page page) {
+        return MethodSpec.methodBuilder(
+                field.getSimpleName().toString() + "_" + method.getSimpleName().toString())
+            .addModifiers(Modifier.PUBLIC)
+            .addAnnotation(stepAnnotationSpec(method, field, page))
+            .returns(ClassName.get(PACKAGE_NAME, page.getPageName()));
     }
 
     private List<TypeVariableName> getTypeParamsFromMethod(List<? extends TypeParameterElement> typeParameterElements) {
@@ -112,14 +127,6 @@ public class SpecsCreator {
             .toList();
     }
 
-    private MethodSpec.Builder defaultMethodSpecBuilder(ExecutableElement method, VariableElement field, Page page) {
-        return MethodSpec.methodBuilder(
-                field.getSimpleName().toString() + "_" + method.getSimpleName().toString())
-            .addModifiers(Modifier.PUBLIC)
-            .addAnnotation(stepAnnotationSpec(method, field, page))
-            .returns(ClassName.get(PACKAGE_NAME, page.getPageName()));
-    }
-
     /*
     Собирает Аннотацию @Step со значением 'pageName methodAction fieldValue'
      */
@@ -131,6 +138,9 @@ public class SpecsCreator {
             .build();
     }
 
+    /*
+    Генерирует методы для инизиализации скринов сгенерированных ранее
+     */
     public MethodSpec generateScreenMethods(Element element) {
         return MethodSpec.methodBuilder(StringUtils.uncapitalize(element.getSimpleName().toString()))
             .addModifiers(Modifier.PUBLIC)
