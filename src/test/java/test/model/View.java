@@ -1,9 +1,9 @@
 package test.model;
 
-import annotation.Widget;
+import annotation.MobileElement;
 import com.codeborne.selenide.appium.SelenideAppiumElement;
 
-@Widget
+@MobileElement
 public class View extends BaseElement {
 
     public View(SelenideAppiumElement element) {
