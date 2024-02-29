@@ -9,6 +9,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.SOURCE)
 public @interface Action {
 
-    String action() default "";
+    String value() default "";
 
 }

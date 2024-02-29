@@ -5,7 +5,6 @@ import static util.Utils.checkCorrectFields;
 import static util.Utils.checkCorrectMethods;
 import static util.Utils.getMobileElementNameFromField;
 import static util.Utils.getMobileElementTypeName;
-import static util.Utils.isNotAnnotated;
 import static util.Utils.validate;
 import annotation.AutoGenPage;
 import annotation.BaseMobileElement;
@@ -16,7 +15,6 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
@@ -49,20 +47,26 @@ public class PageGenerator {
     public PageGenerator collectMobileElements() {
         validateBaseMobileElement();
         List<MobileElementModel> mobileElements = new ArrayList<>();
+        List<ExecutableElement> baseMobileMethods = getBaseMobileMethods();
 
-        roundEnv.getElementsAnnotatedWithAny(Set.of(MobileElement.class, BaseMobileElement.class))
+        roundEnv.getElementsAnnotatedWith(MobileElement.class)
             .forEach(element -> {
-                List<ExecutableElement> publicMethods = getPublicMethods(element);
+                List<ExecutableElement> publicMethods = new ArrayList<>(getPublicMethods(element));
+                publicMethods.addAll(baseMobileMethods);
                 checkCorrectMethods(publicMethods);
-                if (isNotAnnotated(element, BaseMobileElement.class)) {
-                    mobileElements.add(new MobileElementModel(element.asType(), new ArrayList<>(publicMethods)));
-                } else {
-                    mobileElements.forEach(mobileElement -> mobileElement.getMethods().addAll(publicMethods));
-                }
+                mobileElements.add(new MobileElementModel(element.asType(), new ArrayList<>(publicMethods)));
             });
         validate(mobileElements, MobileElement.class);
         this.mobileElements = mobileElements;
         return this;
+    }
+
+    /*
+    Получение всех методов из класса аннотированного BaseMobileElement
+     */
+    private List<ExecutableElement> getBaseMobileMethods() {
+        return getPublicMethods(roundEnv.getElementsAnnotatedWith(BaseMobileElement.class)
+            .stream().toList().get(0));
     }
 
     /*
@@ -107,11 +111,9 @@ public class PageGenerator {
         element.getMethods().forEach(method -> {
             if (method.getParameters().isEmpty() && method.getTypeParameters().isEmpty()) {
                 page.addSpec(specsCreator.getMethodSpecWithoutParams(method, field, page, element).build());
-            }
-            else if (!method.getTypeParameters().isEmpty()) {
+            } else if (!method.getTypeParameters().isEmpty()) {
                 page.addSpec(specsCreator.getMethodSpecWithTypeParams(method, field, page, element).build());
-            }
-            else if (!method.getParameters().isEmpty()) {
+            } else if (!method.getParameters().isEmpty()) {
                 page.addSpec(specsCreator.getMethodSpecWithParams(method, field, page, element).build());
             }
         });

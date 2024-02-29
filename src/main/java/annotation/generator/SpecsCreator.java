@@ -133,7 +133,7 @@ public class SpecsCreator {
     private AnnotationSpec stepAnnotationSpec(ExecutableElement method, VariableElement field, Page page) {
         return AnnotationSpec.builder(Step.class)
             .addMember("value", "$S",
-                page.getPageName() + WHITESPACE + method.getAnnotation(Action.class).action() +
+                page.getPageName() + WHITESPACE + method.getAnnotation(Action.class).value() +
                     WHITESPACE + field.getAnnotation(PageElementGen.class).value())
             .build();
     }

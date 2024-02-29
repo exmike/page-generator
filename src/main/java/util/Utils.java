@@ -79,7 +79,7 @@ public class Utils {
                         method.getSimpleName(), method.getEnclosingElement().getSimpleName().toString()));
             }
 
-            if (method.getAnnotation(Action.class).action().isEmpty()) {
+            if (method.getAnnotation(Action.class).value().isEmpty()) {
                 throw new RuntimeException(
                     String.format("Метод с названием %s в классе %s в аннотации Action должно иметь не пустое значение",
                         method.getSimpleName(), method.getEnclosingElement().getSimpleName().toString())
