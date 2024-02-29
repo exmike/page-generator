@@ -11,12 +11,12 @@ public class Button extends BaseElement {
         super(element);
     }
 
-    @Action(action = "Нажимаем на кнопку")
+    @Action("Нажимаем на кнопку")
     public void click() {
         element.click();
     }
 
-    @Action(action = "Дважды нажимаем на кнопку")
+    @Action("Дважды нажимаем на кнопку")
     public void doubleClick() {
         element.doubleClick();
     }
