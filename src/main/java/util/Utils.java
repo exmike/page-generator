@@ -43,7 +43,15 @@ public class Utils {
             .filter(fields -> fields.getSimpleName().equals(field.getSimpleName()))
             .map(annotation -> annotation.getAnnotation(PageElementGen.class).value())
             .findFirst()
-            .orElseThrow(() -> new RuntimeException("Попробуй муа-муа, попробуй джага-джага"));
+            .orElseThrow(() -> new RuntimeException("Поле не объявлено в BaseScreen"));
+    }
+
+    public static String getFieldAnnotationValue(RoundEnvironment env, VariableElement field) {
+        if (field.getAnnotationMirrors().toString().contains(PageElementGen.class.getName())) {
+            return field.getAnnotation(PageElementGen.class).value();
+        } else {
+            return getAnnotationValue(env, field);
+        }
     }
 
     /**
@@ -52,7 +60,7 @@ public class Utils {
     public static Stream<VariableElement> getBaseScreenFields(RoundEnvironment env) {
         return env.getElementsAnnotatedWith(BasePageObject.class)
             .stream()
-            .flatMap(baseScreenFields -> ElementFilter.fieldsIn((baseScreenFields).getEnclosedElements()).stream());
+            .flatMap(baseScreenFields -> ElementFilter.fieldsIn(baseScreenFields.getEnclosedElements()).stream());
     }
 
     /**
