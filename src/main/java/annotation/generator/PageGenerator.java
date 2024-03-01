@@ -45,6 +45,7 @@ public class PageGenerator {
      * Метод, который собирает все элементы проаннотированные MobileElement и к каждому MobileElement добавляет все
      * методы из BaseMobileElement
      */
+    //todo очень перегружен и плохо читается, надо переделать
     public PageGenerator collectMobileElements() {
         validateBaseMobileElement();
         List<MobileElementModel> mobileElements = new ArrayList<>();
@@ -97,6 +98,7 @@ public class PageGenerator {
     /**
      * Метод собирает все пейджы, которые проаннотированны PageObject'ом, собирая public поля находящиеся в них
      */
+    //todo очень перегружен и плохо читается, надо переделать
     public PageGenerator collectPages() {
         List<Page> pages = this.roundEnv.getElementsAnnotatedWith(PageObject.class)
             .stream()
@@ -113,6 +115,7 @@ public class PageGenerator {
         return this;
     }
 
+    //todo очень перегружен и плохо читается, надо переделать, описание
     private void checkCorrectFields(List<? extends Element> elements, Element page) {
         List<String> basePageElementFields = collector.getBaseScreenFields().stream()
             .map(field -> field.getSimpleName().toString())
@@ -133,6 +136,9 @@ public class PageGenerator {
         });
     }
 
+    /*
+    Собираем поля из BaseScreen
+     */
     private PageGenerator collectBaseScreenFields() {
         collector.setBaseScreenFields(
             roundEnv.getElementsAnnotatedWith(BasePageObject.class)
@@ -145,6 +151,7 @@ public class PageGenerator {
     /*
     Метод для сохранения сгенерированных MethodSpec в каждый из объектов Page
      */
+    //todo очень перегружен и плохо читается, надо переделать
     private void generateMethodSpecToPage(VariableElement field, Page page) {
         String elementTypeNameFromField = getMobileElementNameFromField(field);
 

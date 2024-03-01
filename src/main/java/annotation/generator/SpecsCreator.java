@@ -114,6 +114,7 @@ public class SpecsCreator {
     /*
     Собираем дефолтную спеку для создания полей
      */
+    //todo очень перегружен и плохо читается, надо переделать
     private FieldSpec generateFieldSpecFromField(VariableElement field) {
         FieldSpec.Builder baseBuilder = FieldSpec.builder(TypeName.get(field.asType()),
                 field.getSimpleName().toString())
