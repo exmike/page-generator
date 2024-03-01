@@ -16,31 +16,31 @@ public abstract class BaseElement {
         this.element = element;
     }
 
-    @Action(value = "Проверяем not visible")
+    @Action("Проверяем, что <elementName> не отображается")
     public BaseElement checkNotVisible() {
         element.shouldNotBe(Condition.visible);
         return this;
     }
 
-    @Action(value = "checkExist")
+    @Action("Проверяем, что <elementName> отображается")
     public BaseElement checkExist(List<Object> objects) {
         element.shouldBe(Condition.exist);
         return this;
     }
 
-    @Action(value = "checkTextMoreParams")
+    @Action("Проверяем, что <elementName> содержит текст")
     public BaseElement checkText(String text, String text1, String text2) {
         element.shouldHave(text(text));
         return this;
     }
 
-    @Action(value = "checkTextTypeParams")
+    @Action("Проверяем, что <elementName> содержит тайп параметр")
     public <T, P> BaseElement checkText(T text, P kek) {
         element.shouldHave(text(text.toString()));
         return this;
     }
 
-    @Action(value = "checkTextBogdan")
+    @Action("Проверяем, что <elementName> содержит Богдана?")
     public <Bogdan> BaseElement checkText(Bogdan text) {
         element.shouldHave(text(text.toString()));
         return this;

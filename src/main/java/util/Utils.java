@@ -6,6 +6,8 @@ import com.squareup.javapoet.ParameterSpec;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.VariableElement;
@@ -95,5 +97,24 @@ public class Utils {
         if (elements.isEmpty()) {
             throw new RuntimeException("Не нашли классов аннотированных " + annotation.getSimpleName());
         }
+    }
+
+    /**
+     * Метод позволяет заменить в заданной строке подстроку на основе регулярного выражения.
+     *
+     * @param target    заданная строка;
+     * @param regexp    регулярное выражение, на основании которого будет выполнен поиск подстроки;
+     * @param text текст, на который будет замена найденная по регулярному выражению строка;
+     * @return полученная итоговая строка;
+     */
+    public static String replaceSubstring(String target, String regexp, String text) {
+        StringBuilder result = new StringBuilder();
+        Matcher matcher = Pattern.compile(regexp).matcher(target);
+
+        while (matcher.find()) {
+            result.append(matcher.group());
+        }
+
+        return result.isEmpty() ? target : target.replace(result.toString(), text);
     }
 }

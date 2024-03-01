@@ -4,19 +4,19 @@ import annotation.Action;
 import annotation.MobileElement;
 import com.codeborne.selenide.appium.SelenideAppiumElement;
 
-@MobileElement
+@MobileElement("кнопка")
 public class Button extends BaseElement {
 
     public Button(SelenideAppiumElement element) {
         super(element);
     }
 
-    @Action("Нажимаем на кнопку")
+    @Action("Нажимаем на <elementName>")
     public void click() {
         element.click();
     }
 
-    @Action("Дважды нажимаем на кнопку")
+    @Action("Дважды Нажимаем на <elementName>")
     public void doubleClick() {
         element.doubleClick();
     }
