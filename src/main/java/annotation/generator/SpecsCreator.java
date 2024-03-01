@@ -149,16 +149,16 @@ public class SpecsCreator {
         String typeValue = (((DeclaredType) mobileElement.getType()).asElement()).getAnnotation(MobileElement.class).value();
         String methodValue = method.getAnnotation(Action.class).value();
         String fieldValue = field.getAnnotation(PageElementGen.class).value();
-        String step = Utils.replaceSubstring(methodValue, "<.*?>", typeValue + WHITESPACE + fieldValue);
+        String stepName = Utils.replaceSubstring(methodValue, "<.*?>", typeValue + WHITESPACE + fieldValue);
 
-        if (step.contains("Нажимаем на кнопка")) {
-            step = step.replace("Нажимаем на кнопка", "Нажимаем на кнопку");
+        if (stepName.contains("Нажимаем на кнопка")) {
+            stepName = stepName.replace("Нажимаем на кнопка", "Нажимаем на кнопку");
         }
 
-        if (step.contains("Нажимаем на картинка")) {
-            step = step.replace("Нажимаем на картинка", "Нажимаем на картинку");
+        if (stepName.contains("Нажимаем на картинка")) {
+            stepName = stepName.replace("Нажимаем на картинка", "Нажимаем на картинку");
         }
-        return step;
+        return stepName;
     }
 
     /*
