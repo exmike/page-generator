@@ -131,11 +131,7 @@ public class SpecsCreator {
             .flatMap(List::stream)
             .filter(pageField -> pageField.getSimpleName().equals(field.getSimpleName()))
             .findFirst()
-            .ifPresent(pageField -> {
-                pageField.getAnnotationMirrors().forEach(annotationMirror -> {
-                    builder.addAnnotation(AnnotationSpec.get(annotationMirror));
-                });
-            });
+            .ifPresent(pageField -> builder.addAnnotations(annotationSpecsFromElement(pageField)));
         return builder.addAnnotations(annotationSpecsFromElement(field))
             .build();
     }
