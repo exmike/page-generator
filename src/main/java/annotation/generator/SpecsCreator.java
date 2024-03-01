@@ -78,11 +78,11 @@ public class SpecsCreator {
 
 
     private MethodSpec.Builder defaultMethodSpecBuilder(ExecutableElement method, VariableElement field, Page page,
-        MobileElementModel element) {
+        MobileElementModel mobileElement) {
         return MethodSpec.methodBuilder(
                 field.getSimpleName().toString() + "_" + method.getSimpleName().toString())
             .addModifiers(Modifier.PUBLIC)
-            .addAnnotation(stepAnnotationSpec(method, field, page, element))
+            .addAnnotation(stepAnnotationSpec(method, field, page, mobileElement))
             .returns(ClassName.get(PACKAGE_NAME, page.getPageName()));
     }
 
@@ -134,9 +134,9 @@ public class SpecsCreator {
     Собирает Аннотацию @Step
      */
     private AnnotationSpec stepAnnotationSpec(ExecutableElement method, VariableElement field, Page page,
-        MobileElementModel element) {
+        MobileElementModel mobileElement) {
         return AnnotationSpec.builder(Step.class)
-            .addMember("value", "$S", page.getPageName() + WHITESPACE + processStepName(method, field, element))
+            .addMember("value", "$S", page.getPageName() + WHITESPACE + processStepName(method, field, mobileElement))
             .build();
     }
 
@@ -145,8 +145,8 @@ public class SpecsCreator {
     пример - Проверяем, что кнопка Удалить не отображается.
     Берется действие из метода, и подставляется в <elementName> значение из поля.
      */
-    private String processStepName(ExecutableElement method, VariableElement field, MobileElementModel element) {
-        String typeValue = (((DeclaredType) element.getType()).asElement()).getAnnotation(MobileElement.class).value();
+    private String processStepName(ExecutableElement method, VariableElement field, MobileElementModel mobileElement) {
+        String typeValue = (((DeclaredType) mobileElement.getType()).asElement()).getAnnotation(MobileElement.class).value();
         String methodValue = method.getAnnotation(Action.class).value();
         String fieldValue = field.getAnnotation(PageElementGen.class).value();
         String step = Utils.replaceSubstring(methodValue, "<.*?>", typeValue + WHITESPACE + fieldValue);

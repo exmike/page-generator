@@ -60,7 +60,7 @@ public class PageGenerator {
                 mobileElements.add(
                     new MobileElementModel(element.asType(), new ArrayList<>(publicMobileElementMethods)));
             });
-        validate(mobileElements, MobileElement.class);//todo вероятно не имеет смысла надо проверить
+        validate(mobileElements, MobileElement.class);
         this.mobileElements = mobileElements;
         return this;
     }
