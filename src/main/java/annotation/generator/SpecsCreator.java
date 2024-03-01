@@ -121,14 +121,14 @@ public class SpecsCreator {
     Собираем дефолтную спеку для создания полей
      */
     private FieldSpec generateFieldSpecFromField(VariableElement field) {
-        FieldSpec.Builder builder = FieldSpec.builder(TypeName.get(field.asType()), field.getSimpleName().toString())
+        FieldSpec.Builder baseBuilder = FieldSpec.builder(TypeName.get(field.asType()), field.getSimpleName().toString())
             .addModifiers(Modifier.PRIVATE);
 
         getBaseScreenFields(roundEnvironment)
             .filter(pageField -> pageField.getSimpleName().equals(field.getSimpleName()))
             .findFirst()
-            .ifPresent(pageField -> builder.addAnnotations(annotationSpecsFromElement(pageField)));
-        return builder.addAnnotations(annotationSpecsFromElement(field))
+            .ifPresent(pageField -> baseBuilder.addAnnotations(annotationSpecsFromElement(pageField)));
+        return baseBuilder.addAnnotations(annotationSpecsFromElement(field))
             .build();
     }
 
