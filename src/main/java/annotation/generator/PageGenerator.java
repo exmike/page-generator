@@ -81,8 +81,14 @@ public class PageGenerator {
      */
     public PageGenerator generateMethodsToPage() {
         this.collector.getPages().forEach(page -> {
+            /*
+            Генерация вложенных инициализаций пейджей
+             */
             page.getMethods().forEach(method -> page.addSpec(specsCreator.generateInnerScreenMethods(method)));
 
+            /*
+            Генерация методов на основе доступных полей
+             */
             page.getFields().forEach(field -> generateMethodSpecToPage(field, page));
         });
         return this;
@@ -96,7 +102,7 @@ public class PageGenerator {
             .stream()
             .map(page -> {
                 List<VariableElement> fields = ElementFilter.fieldsIn(page.getEnclosedElements());
-                //todo проверки на методы тоже?
+                //todo проверки на методы тоже обязательно отсеивать ненужные
                 List<ExecutableElement> methods = ElementFilter.methodsIn(page.getEnclosedElements());
                 checkCorrectFields(fields, page);
                 return new Page(page.getSimpleName().toString() + "Gen",

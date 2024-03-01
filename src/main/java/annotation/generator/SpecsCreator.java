@@ -192,7 +192,12 @@ public class SpecsCreator {
     Генерирует вложенные методы для внутренних инициализаций пейджей
      */
     public MethodSpec generateInnerScreenMethods(ExecutableElement element) {
-        String className = StringUtils.capitalize(element.getSimpleName().toString()) + "Gen";
+        /*
+        test.page.LoginScreen -> LoginScreenGen
+         */
+        String className = ((DeclaredType) element.getReturnType())
+            .asElement().getSimpleName().toString() + "Gen";
+
         return MethodSpec.methodBuilder(element.getSimpleName().toString())
             .addModifiers(Modifier.PUBLIC)
             .returns(ClassName.get(PACKAGE_NAME, className))
