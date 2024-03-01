@@ -2,16 +2,20 @@ package util;
 
 import annotation.Action;
 
+import annotation.BasePageObject;
+import annotation.PageElementGen;
 import com.squareup.javapoet.ParameterSpec;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
+import javax.lang.model.util.ElementFilter;
 import model.MobileElementModel;
 
 public class Utils {
@@ -27,6 +31,20 @@ public class Utils {
             .toList()
             .toString()
             .replace("[", "").replace("]", "");
+    }
+
+    /**
+     * Костыль для заполнения value в степе аллюра
+     * Если элемент не помечен PageElementGen - ищем этот же элемент в BaseScreen и берем value у него
+     */
+    public static String getAnnotationValue(RoundEnvironment env, VariableElement field) {
+        return env.getElementsAnnotatedWith(BasePageObject.class)
+            .stream()
+            .flatMap(baseScreenFields -> ElementFilter.fieldsIn((baseScreenFields).getEnclosedElements()).stream())
+            .filter(fields -> fields.getSimpleName().equals(field.getSimpleName()))
+            .map(annotation -> annotation.getAnnotation(PageElementGen.class).value())
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("Попробуй муа-муа, попробуй джага-джага"));
     }
 
     /**
