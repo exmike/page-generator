@@ -151,6 +151,9 @@ public class SpecsCreator {
         String fieldValue = field.getAnnotation(PageElementGen.class).value();
         String stepName = Utils.replaceSubstring(methodValue, "<.*?>", typeValue + WHITESPACE + fieldValue);
 
+        /*
+        Дополнительные ифы чтобы проставить правильно склонения
+         */
         if (stepName.contains("Нажимаем на кнопка")) {
             stepName = stepName.replace("Нажимаем на кнопка", "Нажимаем на кнопку");
         }
