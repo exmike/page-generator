@@ -106,13 +106,13 @@ public class PageGenerator {
             .toList();
 
         elements.forEach(field -> {
-            boolean isFieldInBasePageElementFields = basePageElementFields.contains(field.getSimpleName().toString());
+            boolean isFieldInBasePageElementFields = !basePageElementFields.contains(field.getSimpleName().toString());
 
-            if (isNotAnnotated(field, PageElementGen.class) && !isFieldInBasePageElementFields) {
+            if (isFieldInBasePageElementFields && isNotAnnotated(field, PageElementGen.class)) {
                 throw new RuntimeException(String.format("Поле %s в классе %s должно быть c аннотацией PageElementGen",
                     field, page.getSimpleName()));
             }
-            if (!isFieldInBasePageElementFields && field.getAnnotation(PageElementGen.class).value().isEmpty()) {
+            if (isFieldInBasePageElementFields && field.getAnnotation(PageElementGen.class).value().isEmpty()) {
                 throw new RuntimeException(String.format("Поле %s в классе %s в аннотации PageElement должно иметь не пустое значение",
                     field, page.getSimpleName()));
             }
