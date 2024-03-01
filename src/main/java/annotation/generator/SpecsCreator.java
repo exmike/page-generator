@@ -191,7 +191,7 @@ public class SpecsCreator {
     /*
     Генерирует вложенные методы для внутренних инициализаций пейджей
      */
-    public MethodSpec generate(ExecutableElement element) {
+    public MethodSpec generateInnerScreenMethods(ExecutableElement element) {
         String className = StringUtils.capitalize(element.getSimpleName().toString()) + "Gen";
         return MethodSpec.methodBuilder(element.getSimpleName().toString())
             .addModifiers(Modifier.PUBLIC)

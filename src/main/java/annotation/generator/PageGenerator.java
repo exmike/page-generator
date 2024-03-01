@@ -81,7 +81,7 @@ public class PageGenerator {
      */
     public PageGenerator generateMethodsToPage() {
         this.collector.getPages().forEach(page -> {
-            page.getMethods().forEach(method -> page.addSpec(specsCreator.generate(method)));
+            page.getMethods().forEach(method -> page.addSpec(specsCreator.generateInnerScreenMethods(method)));
 
             page.getFields().forEach(field -> generateMethodSpecToPage(field, page));
         });
