@@ -75,25 +75,6 @@ public class Utils {
             .orElseThrow(() -> new RuntimeException("getMobileElementNameFromField"));
     }
 
-//    public void checkCorrectFields(List<? extends Element> elements, Element page) {
-//
-//        roundEnv.getElementsAnnotatedWith(BasePageObject.class);
-//
-//        elements.forEach(field -> {
-//            if (isNotAnnotated(field, PageElementGen.class)) {
-//                throw new RuntimeException(String.format("Поле %s в классе %s должно быть c аннотацией PageElement",
-//                    field, page.getSimpleName()));
-//            }
-//
-//            if (field.getAnnotation(PageElementGen.class).value().isEmpty() || !elements.contains(ElementFilter.fieldsIn(page.getEnclosedElements()))) {
-//                throw new RuntimeException(
-//                    String.format("Поле %s в классе %s в аннотации PageElement должно иметь не пустое значение",
-//                        field, page.getSimpleName())
-//                );
-//            }
-//        });
-//    }
-
     public static void checkCorrectMethods(List<? extends Element> elements) {
         elements.forEach(method -> {
             if (isNotAnnotated(method, Action.class)) {
