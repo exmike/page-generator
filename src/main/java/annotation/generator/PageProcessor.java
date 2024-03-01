@@ -26,7 +26,7 @@ public class PageProcessor extends AbstractProcessor {
             return true;
         }
         Logger log = new Logger(processingEnv.getMessager());
-        PageGenerator pageGenerator = new PageGenerator(log, roundEnv, new SpecsCreator(), processingEnv);
+        PageGenerator pageGenerator = new PageGenerator(log, roundEnv, new SpecsCreator(roundEnv), processingEnv);
 
         if (roundCount == 2) {
             pageGenerator.generateScreenManager();
