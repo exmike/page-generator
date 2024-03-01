@@ -52,7 +52,8 @@ public class PageGenerator {
         roundEnv.getElementsAnnotatedWith(MobileElement.class)
             .forEach(element -> {
                 if (element.getAnnotation(MobileElement.class).value().isEmpty()) {
-                    throw new RuntimeException(element.getSimpleName() + " value in anno should not be empty");//todo
+                    throw new RuntimeException(
+                        String.format("Value in MobileElement %s should not be empty", element.getSimpleName()));//todo
                 }
                 List<ExecutableElement> publicMobileElementMethods = new ArrayList<>(getPublicMethods(element));
                 publicMobileElementMethods.addAll(baseMobileMethods);
