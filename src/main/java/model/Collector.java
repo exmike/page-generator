@@ -17,7 +17,6 @@ public class Collector {
     private List<MobileElementModel> mobileElements;
     private List<Page> pages;
     private List<VariableElement> baseScreenFields;
-    private List<? extends Element> generatedPages;
 
     private Collector() {
 
