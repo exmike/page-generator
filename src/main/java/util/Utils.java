@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
@@ -38,13 +39,20 @@ public class Utils {
      * Если элемент не помечен PageElementGen - ищем этот же элемент в BaseScreen и берем value у него
      */
     public static String getAnnotationValue(RoundEnvironment env, VariableElement field) {
-        return env.getElementsAnnotatedWith(BasePageObject.class)
-            .stream()
-            .flatMap(baseScreenFields -> ElementFilter.fieldsIn((baseScreenFields).getEnclosedElements()).stream())
+        return getBaseScreenFields(env)
             .filter(fields -> fields.getSimpleName().equals(field.getSimpleName()))
             .map(annotation -> annotation.getAnnotation(PageElementGen.class).value())
             .findFirst()
             .orElseThrow(() -> new RuntimeException("Попробуй муа-муа, попробуй джага-джага"));
+    }
+
+    /**
+     * Метод для получения филдов из BaseScreen
+     */
+    public static Stream<VariableElement> getBaseScreenFields(RoundEnvironment env) {
+        return env.getElementsAnnotatedWith(BasePageObject.class)
+            .stream()
+            .flatMap(baseScreenFields -> ElementFilter.fieldsIn((baseScreenFields).getEnclosedElements()).stream());
     }
 
     /**
