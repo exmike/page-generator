@@ -26,7 +26,7 @@ public class PageProcessor extends AbstractProcessor {
             return true;
         }
         Logger log = new Logger(processingEnv.getMessager());
-        PageGenerator pageGenerator = new PageGenerator(log, roundEnv, new SpecsCreator(roundEnv), processingEnv);
+        PageGenerator pageGenerator = new PageGenerator(log, roundEnv, new SpecsCreator(), processingEnv);
 
         if (roundCount == 2) {
             pageGenerator.generateScreenManager();
@@ -40,10 +40,11 @@ public class PageProcessor extends AbstractProcessor {
 
     /*
     todo list
+    - Исключить из скрин менеджера пейджы, которые уже заиничены внутрь других пейджей
     - Написать юнит-тесты(вероятно мокито)
     - Нужен механизм для генерации методов в определенные пейджи на основе полей из BaseScreen (done)
     - Нужен механизм для возможности итераций по раундам (kek done try to rework)
-    - Подумать над скринами, которые инитятся внутри других скринов
+    - Подумать над скринами, которые инитятся внутри других скринов (done)
     - *Добавить логгирование аналогичное собранному значению в @Step'e (доработать StepListener в проекте)
     - Помолиться
      */

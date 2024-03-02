@@ -1,8 +1,6 @@
 package util;
 
 import annotation.Action;
-
-import annotation.BasePageObject;
 import annotation.PageElementGen;
 import com.squareup.javapoet.ParameterSpec;
 import java.lang.annotation.Annotation;
@@ -10,13 +8,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
-import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
-import javax.lang.model.util.ElementFilter;
+import model.Collector;
 import model.MobileElementModel;
 
 public class Utils {
@@ -35,33 +31,25 @@ public class Utils {
     }
 
     /**
-     * Костыль для заполнения value в степе аллюра
-     * Если элемент не помечен PageElementGen - ищем этот же элемент в BaseScreen и берем value у него
+     * Костыль для заполнения value в степе аллюра Если элемент не помечен PageElementGen - ищем этот же элемент в
+     * BaseScreen и берем value у него
      */
-    public static String getAnnotationValue(RoundEnvironment env, VariableElement field) {
-        return getBaseScreenFields(env)
+    public static String getAnnotationValue(VariableElement field) {
+        return Collector.getInstance().getBaseScreenFields().stream()
             .filter(fields -> fields.getSimpleName().equals(field.getSimpleName()))
             .map(annotation -> annotation.getAnnotation(PageElementGen.class).value())
             .findFirst()
             .orElseThrow(() -> new RuntimeException("Поле не объявлено в BaseScreen"));
     }
 
-    public static String getFieldAnnotationValue(RoundEnvironment env, VariableElement field) {
+    public static String getFieldAnnotationValue(VariableElement field) {
         if (field.getAnnotationMirrors().toString().contains(PageElementGen.class.getName())) {
             return field.getAnnotation(PageElementGen.class).value();
         } else {
-            return getAnnotationValue(env, field);
+            return getAnnotationValue(field);
         }
     }
 
-    /**
-     * Метод для получения филдов из BaseScreen
-     */
-    public static Stream<VariableElement> getBaseScreenFields(RoundEnvironment env) {
-        return env.getElementsAnnotatedWith(BasePageObject.class)
-            .stream()
-            .flatMap(baseScreenFields -> ElementFilter.fieldsIn(baseScreenFields.getEnclosedElements()).stream());
-    }
 
     /**
      * Метод для проверки есть ли на классе специфическая аннотация
@@ -120,9 +108,9 @@ public class Utils {
     /**
      * Метод позволяет заменить в заданной строке подстроку на основе регулярного выражения.
      *
-     * @param target    заданная строка;
-     * @param regexp    регулярное выражение, на основании которого будет выполнен поиск подстроки;
-     * @param text текст, на который будет замена найденная по регулярному выражению строка;
+     * @param target заданная строка;
+     * @param regexp регулярное выражение, на основании которого будет выполнен поиск подстроки;
+     * @param text   текст, на который будет замена найденная по регулярному выражению строка;
      * @return полученная итоговая строка;
      */
     public static String replaceSubstring(String target, String regexp, String text) {
