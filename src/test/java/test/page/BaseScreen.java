@@ -18,4 +18,12 @@ public abstract class BaseScreen {
     @AndroidFindBy(xpath = "//android.widget.ImageButton[@content-desc='Navigate up']")
     private SelenideAppiumElement backButton;
 
+
+    @PageElementGen("Логин")
+    @HowToUseLocators(androidAutomation = LocatorGroupStrategy.ALL_POSSIBLE)
+    @iOSXCUITFindBy(iOSClassChain = "**/XCUIElementTypeNavigationBar/XCUIElementTypeButton")
+    @AndroidFindBy(xpath = "//android.widget.ImageButton[@content-desc='Back']")
+    @AndroidFindBy(xpath = "//android.widget.ImageButton[@content-desc='Navigate up']")
+    private SelenideAppiumElement loginButton;
+
 }

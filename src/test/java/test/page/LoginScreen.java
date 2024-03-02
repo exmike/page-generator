@@ -9,6 +9,8 @@ import io.appium.java_client.pagefactory.AndroidFindBy;
 @PageObject
 public class LoginScreen extends BaseScreen {
 
+    private SelenideAppiumElement loginButton;
+
     @PageElementGen(value = "лайк")
     @AndroidFindBy(xpath = "xpath")
     private SelenideAppiumElement likeButton;

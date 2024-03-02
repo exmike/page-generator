@@ -12,6 +12,7 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
+import model.Collector;
 import model.MobileElementModel;
 
 public class Utils {
@@ -28,6 +29,27 @@ public class Utils {
             .toString()
             .replace("[", "").replace("]", "");
     }
+
+    /**
+     * Костыль для заполнения value в степе аллюра Если элемент не помечен PageElementGen - ищем этот же элемент в
+     * BaseScreen и берем value у него
+     */
+    public static String getAnnotationValue(VariableElement field) {
+        return Collector.getInstance().getBaseScreenFields().stream()
+            .filter(fields -> fields.getSimpleName().equals(field.getSimpleName()))
+            .map(annotation -> annotation.getAnnotation(PageElementGen.class).value())
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("Поле не объявлено в BaseScreen"));
+    }
+
+    public static String getFieldAnnotationValue(VariableElement field) {
+        if (field.getAnnotationMirrors().toString().contains(PageElementGen.class.getName())) {
+            return field.getAnnotation(PageElementGen.class).value();
+        } else {
+            return getAnnotationValue(field);
+        }
+    }
+
 
     /**
      * Метод для проверки есть ли на классе специфическая аннотация
@@ -55,22 +77,6 @@ public class Utils {
         return Arrays.stream(field.getSimpleName().toString().split("(?=[A-Z])"))
             .reduce((head, tail) -> tail)
             .orElseThrow(() -> new RuntimeException("getMobileElementNameFromField"));
-    }
-
-    public static void checkCorrectFields(List<? extends Element> elements, Element page) {
-        elements.forEach(field -> {
-            if (isNotAnnotated(field, PageElementGen.class)) {
-                throw new RuntimeException(String.format("Поле %s в классе %s должно быть c аннотацией PageElement",
-                    field, page.getSimpleName()));
-            }
-
-            if (field.getAnnotation(PageElementGen.class).value().isEmpty()) {
-                throw new RuntimeException(
-                    String.format("Поле %s в классе %s в аннотации PageElement должно иметь не пустое значение",
-                        field, page.getSimpleName())
-                );
-            }
-        });
     }
 
     public static void checkCorrectMethods(List<? extends Element> elements) {
@@ -102,9 +108,9 @@ public class Utils {
     /**
      * Метод позволяет заменить в заданной строке подстроку на основе регулярного выражения.
      *
-     * @param target    заданная строка;
-     * @param regexp    регулярное выражение, на основании которого будет выполнен поиск подстроки;
-     * @param text текст, на который будет замена найденная по регулярному выражению строка;
+     * @param target заданная строка;
+     * @param regexp регулярное выражение, на основании которого будет выполнен поиск подстроки;
+     * @param text   текст, на который будет замена найденная по регулярному выражению строка;
      * @return полученная итоговая строка;
      */
     public static String replaceSubstring(String target, String regexp, String text) {
