@@ -123,4 +123,35 @@ public class Utils {
 
         return result.isEmpty() ? target : target.replace(result.toString(), text);
     }
+
+    /**
+     * Метод позволяет получить подстроку в заданной строке по регулярному выражению.
+     *
+     * @param str    - заданная строка;
+     * @param regexp - регулярное выражение, по которому происходит поиск в заданной строке;
+     * @return возвращается первое совпадение, если его нет то пустая строка;
+     */
+    public static String getSubstring(String str, String regexp) {
+        String result = "";
+
+        Pattern pattern = Pattern.compile(regexp);
+        Matcher matcher = pattern.matcher(str);
+
+        if (matcher.find()) {
+            result = matcher.group();
+        }
+
+        return result;
+    }
+
+    /*
+    Метод для проверки сопоставления типа MobileElement и значения из Field
+    Пример -> mobileElement = Button, field = nextButton, return - true;otherwise false
+     */
+    public static boolean isFieldTypeCorrect(MobileElementModel mobileElement, VariableElement field) {
+        String elementName = getMobileElementTypeName(mobileElement);
+
+        return !getSubstring(field.getSimpleName().toString(),
+            elementName + "$").isEmpty();
+    }
 }

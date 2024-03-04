@@ -28,12 +28,17 @@ public class PageProcessor extends AbstractProcessor {
         Logger log = new Logger(processingEnv.getMessager());
         PageGenerator pageGenerator = new PageGenerator(log, roundEnv, new SpecsCreator(), processingEnv);
 
-        if (roundCount == 2) {
-            pageGenerator.generateScreenManager();
-            return true;
+        switch (roundCount) {
+            /*
+            В первом раунде происходит генерация новых классов
+             */
+            case 1 -> pageGenerator.generatePages();
+            /*
+            Во втором раунде генерируется ScreenManager на основе ранее сгенерированных классов
+             */
+            case 2 -> pageGenerator.generateScreenManager();
         }
 
-        pageGenerator.generatePages();
         return true;
     }
 }

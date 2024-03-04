@@ -4,6 +4,7 @@ import static com.codeborne.selenide.Condition.text;
 import annotation.Action;
 import annotation.BaseMobileElement;
 import com.codeborne.selenide.Condition;
+import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.appium.SelenideAppiumElement;
 import java.util.List;
 
@@ -11,9 +12,14 @@ import java.util.List;
 public abstract class BaseElement {
 
     protected SelenideAppiumElement element;
+    protected ElementsCollection collection;
 
     protected BaseElement(SelenideAppiumElement element) {
         this.element = element;
+    }
+
+    protected BaseElement(ElementsCollection collection) {
+        this.collection = collection;
     }
 
     @Action("Проверяем, что <elementName> не отображается")
