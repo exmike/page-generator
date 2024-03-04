@@ -25,5 +25,5 @@ public class ErrorScreen extends BaseScreen {
     @PageElementGen("Экран")
     @iOSXCUITFindBy(iOSClassChain = "**/XCUIElementTypeNavigationBar/XCUIElementTypeButton")
     @AndroidFindBy(xpath = "//android.widget.ImageButton[@content-desc='Navigate up']")
-    private SelenideAppiumElement view;
+    private SelenideAppiumElement screenView;
 }
