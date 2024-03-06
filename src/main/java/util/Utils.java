@@ -73,6 +73,7 @@ public class Utils {
     /*
     Метод для получения типа виджета из филда пейджи titleLabel -> Label
     */
+    @Deprecated
     public static String getMobileElementNameFromField(VariableElement field) {
         return Arrays.stream(field.getSimpleName().toString().split("(?=[A-Z])"))
             .reduce((head, tail) -> tail)

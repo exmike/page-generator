@@ -118,19 +118,21 @@ public class SpecsCreator {
     private FieldSpec generateFieldSpecFromField(VariableElement field) {
         FieldSpec.Builder baseBuilder = FieldSpec.builder(TypeName.get(field.asType()),
                 field.getSimpleName().toString())
-            .addModifiers(Modifier.PRIVATE);
+            .addModifiers(Modifier.PRIVATE)
+            .addAnnotations(annotationSpecsFromElement(field));
 
         /*
          Проверка на сопоставление текущего поля с доступными полями из BaseScreen
          при соответствии добавляются аннотации на поле
+         Отработает только в том случае, если на поле не было аннотаций и мы не "переопределили" филд
          */
-        Collector.getInstance().getBaseScreenFields().stream()
-            .filter(pageField -> pageField.getSimpleName().equals(field.getSimpleName()))
-            .findFirst()
-            .ifPresent(pageField -> baseBuilder.addAnnotations(annotationSpecsFromElement(pageField)));
-
-        return baseBuilder.addAnnotations(annotationSpecsFromElement(field))
-            .build();
+        if (baseBuilder.annotations.isEmpty()) {
+            Collector.getInstance().getBaseScreenFields().stream()
+                .filter(pageField -> pageField.getSimpleName().equals(field.getSimpleName()))
+                .findFirst()
+                .ifPresent(pageField -> baseBuilder.addAnnotations(annotationSpecsFromElement(pageField)));
+        }
+        return baseBuilder.build();
     }
 
     /*
@@ -182,7 +184,7 @@ public class SpecsCreator {
     Генерирует методы для инизиализации скринов сгенерированных ранее
      */
     public MethodSpec generateScreenMethods(Element element) {
-        return MethodSpec.methodBuilder(StringUtils.uncapitalize(element.getSimpleName().toString()))
+        return MethodSpec.methodBuilder(StringUtils.uncapitalize(element.getSimpleName().toString().replace("Gen", "")))
             .addModifiers(Modifier.PUBLIC)
             .returns(ClassName.get(PACKAGE_NAME, element.getSimpleName().toString()))
             .addStatement("return $T.screen(" + element.getSimpleName().toString() + ".class)", ScreenObject.class)

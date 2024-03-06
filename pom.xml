@@ -10,7 +10,15 @@
     <name>page-generator</name>
     <url>http://maven.apache.org</url>
 
+    <distributionManagement>
+        <repository>
+            <id>nexus</id>
+            <name>mts-nexus</name>
+            <url>https://nexus.services.mts.ru/repository/maven-central/</url>
+        </repository>
+    </distributionManagement>
     <properties>
+
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
