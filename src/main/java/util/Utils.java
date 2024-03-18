@@ -1,10 +1,11 @@
 package util;
 
 import annotation.Action;
-import annotation.PageElementGen;
+import annotation.PageElement;
 import com.squareup.javapoet.ParameterSpec;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,20 +32,20 @@ public class Utils {
     }
 
     /**
-     * Костыль для заполнения value в степе аллюра Если элемент не помечен PageElementGen - ищем этот же элемент в
+     * Костыль для заполнения value в степе аллюра Если элемент не помечен PageElement - ищем этот же элемент в
      * BaseScreen и берем value у него
      */
     public static String getAnnotationValue(VariableElement field) {
         return Collector.getInstance().getBaseScreenFields().stream()
             .filter(fields -> fields.getSimpleName().equals(field.getSimpleName()))
-            .map(annotation -> annotation.getAnnotation(PageElementGen.class).value())
+            .map(annotation -> annotation.getAnnotation(PageElement.class).value())
             .findFirst()
             .orElseThrow(() -> new RuntimeException("Поле не объявлено в BaseScreen"));
     }
 
     public static String getFieldAnnotationValue(VariableElement field) {
-        if (field.getAnnotationMirrors().toString().contains(PageElementGen.class.getName())) {
-            return field.getAnnotation(PageElementGen.class).value();
+        if (field.getAnnotationMirrors().toString().contains(PageElement.class.getName())) {
+            return field.getAnnotation(PageElement.class).value();
         } else {
             return getAnnotationValue(field);
         }
@@ -81,6 +82,7 @@ public class Utils {
     }
 
     public static void checkCorrectMethods(List<? extends Element> elements) {
+        checkDuplicates(elements);
         elements.forEach(method -> {
             if (isNotAnnotated(method, Action.class)) {
                 throw new RuntimeException(
@@ -95,6 +97,20 @@ public class Utils {
                 );
             }
         });
+    }
+
+    /*
+    Проверка на дубли методов, если есть оверрайд, то структура класса сгенерированного сломается
+     */
+    private static void checkDuplicates(List<? extends Element> elements) {
+        List<String> methodNames = elements.stream()
+            .map(Object::toString)
+            .toList();
+
+        if (methodNames.size() > new HashSet<>(methodNames).size()) {
+            throw new RuntimeException(
+                "Найдены дубликаты методов скорее всего в наследнике BaseElement переопределен один из методов");
+        }
     }
 
     /*

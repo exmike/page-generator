@@ -184,7 +184,7 @@ public class SpecsCreator {
     Генерирует методы для инизиализации скринов сгенерированных ранее
      */
     public MethodSpec generateScreenMethods(Element element) {
-        return MethodSpec.methodBuilder(StringUtils.uncapitalize(element.getSimpleName().toString().replace("Gen", "")))
+        return MethodSpec.methodBuilder(StringUtils.uncapitalize(element.getSimpleName().toString()))
             .addModifiers(Modifier.PUBLIC)
             .returns(ClassName.get(PACKAGE_NAME, element.getSimpleName().toString()))
             .addStatement("return $T.screen(" + element.getSimpleName().toString() + ".class)", ScreenObject.class)
@@ -196,15 +196,26 @@ public class SpecsCreator {
      */
     public MethodSpec generateInnerScreenMethods(ExecutableElement element) {
         /*
-        test.page.LoginScreen -> LoginScreenGen
+        test.page.LoginScreen -> LoginScreen
          */
         String className = ((DeclaredType) element.getReturnType())
-            .asElement().getSimpleName().toString() + "Gen";
+            .asElement().getSimpleName().toString();
 
         return MethodSpec.methodBuilder(element.getSimpleName().toString())
             .addModifiers(Modifier.PUBLIC)
             .returns(ClassName.get(PACKAGE_NAME, className))
             .addStatement("return $T.screen(" + className + ".class)", ScreenObject.class)
+            .build();
+    }
+
+    /*
+    Генерирует методы для возможности вернуть поле класса
+     */
+    public MethodSpec generateGetMethods(VariableElement element) {
+        return MethodSpec.methodBuilder(element.getSimpleName().toString() + "_get")
+            .addModifiers(Modifier.PUBLIC)
+            .returns(TypeName.get(element.asType()))
+            .addStatement("return this." + element.getSimpleName().toString())
             .build();
     }
 }

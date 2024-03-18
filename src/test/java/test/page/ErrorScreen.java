@@ -1,6 +1,6 @@
 package test.page;
 
-import annotation.PageElementGen;
+import annotation.PageElement;
 import annotation.PageObject;
 import com.codeborne.selenide.appium.SelenideAppiumElement;
 import io.appium.java_client.pagefactory.AndroidFindBy;
@@ -11,18 +11,18 @@ import io.appium.java_client.pagefactory.iOSXCUITFindBy;
 @PageObject
 public class ErrorScreen extends BaseScreen {
 
-    @PageElementGen("Удалить")
+    @PageElement("Удалить")
     @HowToUseLocators(androidAutomation = LocatorGroupStrategy.ALL_POSSIBLE)
     @iOSXCUITFindBy(iOSClassChain = "**/XCUIElementTypeNavigationBar/XCUIElementTypeButton")
     @AndroidFindBy(xpath = "//android.widget.ImageButton[@content-desc='Back']")
     @AndroidFindBy(xpath = "//android.widget.ImageButton[@content-desc='Navigate up']")
     private SelenideAppiumElement deleteButton;
 
-    @PageElementGen("инфо")
+    @PageElement("инфо")
     @AndroidFindBy(xpath = "xpath")
     private SelenideAppiumElement infoLabel;
 
-    @PageElementGen("Экран")
+    @PageElement("Экран")
     @iOSXCUITFindBy(iOSClassChain = "**/XCUIElementTypeNavigationBar/XCUIElementTypeButton")
     @AndroidFindBy(xpath = "//android.widget.ImageButton[@content-desc='Navigate up']")
     private SelenideAppiumElement screenView;
