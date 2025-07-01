@@ -21,7 +21,7 @@ public class LoginScreen extends BaseScreen {
     private SelenideAppiumElement titleLabel;
 
     @AndroidFindBy(xpath = "xpath")
-    @PageElement(value = "лист")
+    @PageElement(value = "лист", timeout = 10)
     public ElementsCollection nextButtonElementsList;
 
     public DeviceWidget deviceWidget() {

@@ -4,6 +4,7 @@ import annotation.Action;
 import annotation.MobileElement;
 import com.codeborne.selenide.CollectionCondition;
 import com.codeborne.selenide.ElementsCollection;
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 
 @MobileElement("лист")
@@ -19,4 +20,11 @@ public class ElementsList {
             .click();
         return this;
     }
+
+    @Action("Проверяем, что в <elementName> есть элементы")
+    public ElementsList waitElement(Duration duration) {
+        collection.shouldHave(CollectionCondition.sizeGreaterThanOrEqual(1), duration);
+        return this;
+    }
+
 }

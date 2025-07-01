@@ -22,7 +22,7 @@ public class Utils {
     public static final String WHITESPACE = " ";
 
     //todo mb rework
-    //[aboba],[kek] -> aboba, kek
+    //[aboba], [kek] -> aboba, kek
     public static String formatParamListToString(List<ParameterSpec> parameterSpecs) {
         return parameterSpecs.stream()
             .map(parameterSpec -> parameterSpec.name)
@@ -92,7 +92,7 @@ public class Utils {
 
             if (method.getAnnotation(Action.class).value().isEmpty()) {
                 throw new RuntimeException(
-                    String.format("Метод с названием %s в классе %s в аннотации Action должно иметь не пустое значение",
+                    String.format("Метод с названием %s в классе %s в аннотации Action должен иметь не пустое значение",
                         method.getSimpleName(), method.getEnclosingElement().getSimpleName().toString())
                 );
             }

@@ -4,13 +4,13 @@ import static com.codeborne.selenide.Condition.text;
 import annotation.Action;
 import annotation.BaseMobileElement;
 import com.codeborne.selenide.Condition;
-import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.appium.SelenideAppiumElement;
+import java.time.Duration;
 import java.util.List;
 
 @BaseMobileElement
 public abstract class BaseElement {
-
+    //комментарий
     protected SelenideAppiumElement element;
 
     protected BaseElement(SelenideAppiumElement element) {
@@ -44,6 +44,12 @@ public abstract class BaseElement {
     @Action("Проверяем, что <elementName> содержит Богдана?")
     public <Bogdan> BaseElement checkText(Bogdan text) {
         element.shouldHave(text(text.toString()));
+        return this;
+    }
+
+    @Action("Ожидаем загрузки <elementName>")
+    public BaseElement waitElement(Duration duration) {
+        element.shouldBe(Condition.exist, duration);
         return this;
     }
 
