@@ -196,6 +196,7 @@ public class SpecsCreator {
      */
     public MethodSpec generateInnerScreenMethods(ExecutableElement element) {
         /*
+
         test.page.LoginScreen -> LoginScreen
          */
         String className = ((DeclaredType) element.getReturnType())
