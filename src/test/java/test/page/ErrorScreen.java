@@ -2,11 +2,13 @@ package test.page;
 
 import annotation.PageElement;
 import annotation.PageObject;
+import com.codeborne.selenide.SelenideElement;
 import com.codeborne.selenide.appium.SelenideAppiumElement;
 import io.appium.java_client.pagefactory.AndroidFindBy;
 import io.appium.java_client.pagefactory.HowToUseLocators;
 import io.appium.java_client.pagefactory.LocatorGroupStrategy;
 import io.appium.java_client.pagefactory.iOSXCUITFindBy;
+import org.openqa.selenium.support.FindBy;
 
 @PageObject
 public class ErrorScreen extends BaseScreen {
@@ -26,4 +28,8 @@ public class ErrorScreen extends BaseScreen {
     @iOSXCUITFindBy(iOSClassChain = "**/XCUIElementTypeNavigationBar/XCUIElementTypeButton")
     @AndroidFindBy(xpath = "//android.widget.ImageButton[@content-desc='Navigate up']")
     private SelenideAppiumElement screenView;
+
+    @PageElement("Лейбл")
+    @FindBy(id = "kek")
+    private SelenideElement kekLabel;
 }

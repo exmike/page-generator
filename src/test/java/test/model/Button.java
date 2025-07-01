@@ -1,13 +1,13 @@
 package test.model;
 
 import annotation.Action;
-import annotation.MobileElement;
-import com.codeborne.selenide.appium.SelenideAppiumElement;
+import annotation.Element;
+import com.codeborne.selenide.SelenideElement;
 
-@MobileElement("кнопка")
+@Element("кнопка")
 public class Button extends BaseElement {
 
-    public Button(SelenideAppiumElement element) {
+    public Button(SelenideElement element) {
         super(element);
     }
 

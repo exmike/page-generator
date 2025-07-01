@@ -10,11 +10,10 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.Element;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import model.Collector;
-import model.MobileElementModel;
+import model.Element;
 
 public class Utils {
 
@@ -55,7 +54,7 @@ public class Utils {
     /**
      * Метод для проверки есть ли на классе специфическая аннотация
      */
-    public static boolean isNotAnnotated(Element element, Class<? extends Annotation> clazz) {
+    public static boolean isNotAnnotated(javax.lang.model.element.Element element, Class<? extends Annotation> clazz) {
         for (AnnotationMirror annotation : element.getAnnotationMirrors()) {
             if (annotation.getAnnotationType().toString().equals(clazz.getName())) {
                 return false;
@@ -67,7 +66,7 @@ public class Utils {
     /**
      * Метод для получения типа виджета из пакета test.model.Button -> Button
      */
-    public static String getMobileElementTypeName(MobileElementModel model) {
+    public static String getElementTypeName(Element model) {
         return (((DeclaredType) model.getType()).asElement()).getSimpleName().toString();
     }
 
@@ -75,13 +74,13 @@ public class Utils {
     Метод для получения типа виджета из филда пейджи titleLabel -> Label
     */
     @Deprecated
-    public static String getMobileElementNameFromField(VariableElement field) {
+    public static String getElementNameFromField(VariableElement field) {
         return Arrays.stream(field.getSimpleName().toString().split("(?=[A-Z])"))
             .reduce((head, tail) -> tail)
-            .orElseThrow(() -> new RuntimeException("getMobileElementNameFromField"));
+            .orElseThrow(() -> new RuntimeException("getElementNameFromField"));
     }
 
-    public static void checkCorrectMethods(List<? extends Element> elements) {
+    public static void checkCorrectMethods(List<? extends javax.lang.model.element.Element> elements) {
         checkDuplicates(elements);
         elements.forEach(method -> {
             if (isNotAnnotated(method, Action.class)) {
@@ -102,7 +101,7 @@ public class Utils {
     /*
     Проверка на дубли методов, если есть оверрайд, то структура класса сгенерированного сломается
      */
-    private static void checkDuplicates(List<? extends Element> elements) {
+    private static void checkDuplicates(List<? extends javax.lang.model.element.Element> elements) {
         List<String> methodNames = elements.stream()
             .map(Object::toString)
             .toList();
@@ -162,11 +161,11 @@ public class Utils {
     }
 
     /*
-    Метод для проверки сопоставления типа MobileElement и значения из Field
-    Пример -> mobileElement = Button, field = nextButton, return - true;otherwise false
+    Метод для проверки сопоставления типа Element и значения из Field
+    Пример -> Element = Button, field = nextButton, return - true;otherwise false
      */
-    public static boolean isFieldTypeCorrect(MobileElementModel mobileElement, VariableElement field) {
-        String elementName = getMobileElementTypeName(mobileElement);
+    public static boolean isFieldTypeCorrect(Element element, VariableElement field) {
+        String elementName = getElementTypeName(element);
 
         return !getSubstring(field.getSimpleName().toString(),
             elementName + "$").isEmpty();

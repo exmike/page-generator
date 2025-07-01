@@ -1,9 +1,8 @@
 package model;
 
 import static util.Utils.WHITESPACE;
-import static util.Utils.getMobileElementTypeName;
+import static util.Utils.getElementTypeName;
 import java.util.List;
-import javax.lang.model.element.Element;
 import javax.lang.model.element.VariableElement;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,7 +13,7 @@ public class Collector {
 
     private static final Collector INSTANCE = new Collector();
 
-    private List<MobileElementModel> mobileElements;
+    private List<Element> element;
     private List<Page> pages;
     private List<VariableElement> baseScreenFields;
 
@@ -22,10 +21,10 @@ public class Collector {
 
     }
 
-    public String getStringMobileElements() {
+    public String getStringElements() {
         StringBuilder sb = new StringBuilder();
-        for (MobileElementModel element : this.mobileElements) {
-            sb.append(getMobileElementTypeName(element)).append(WHITESPACE);
+        for (Element element : this.element) {
+            sb.append(getElementTypeName(element)).append(WHITESPACE);
         }
         return sb.toString();
     }

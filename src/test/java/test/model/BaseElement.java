@@ -2,18 +2,17 @@ package test.model;
 
 import static com.codeborne.selenide.Condition.text;
 import annotation.Action;
-import annotation.BaseMobileElement;
 import com.codeborne.selenide.Condition;
-import com.codeborne.selenide.appium.SelenideAppiumElement;
+import com.codeborne.selenide.SelenideElement;
 import java.time.Duration;
 import java.util.List;
 
-@BaseMobileElement
+@annotation.BaseElement
 public abstract class BaseElement {
     //комментарий
-    protected SelenideAppiumElement element;
+    protected SelenideElement element;
 
-    protected BaseElement(SelenideAppiumElement element) {
+    protected BaseElement(SelenideElement element) {
         this.element = element;
     }
 

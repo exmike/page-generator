@@ -12,7 +12,7 @@ import javax.lang.model.element.TypeElement;
 import util.Logger;
 
 @SupportedAnnotationTypes("annotation.*")
-@SupportedSourceVersion(SourceVersion.RELEASE_17)
+@SupportedSourceVersion(SourceVersion.RELEASE_21)
 @AutoService(Processor.class)
 public class PageProcessor extends AbstractProcessor {
 

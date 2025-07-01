@@ -8,7 +8,7 @@ import lombok.Data;
 
 @AllArgsConstructor
 @Data
-public class MobileElementModel {
+public class Element {
 
     private TypeMirror type;
     private List<ExecutableElement> methods;

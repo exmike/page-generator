@@ -1,12 +1,12 @@
 package test.model;
 
-import annotation.MobileElement;
-import com.codeborne.selenide.appium.SelenideAppiumElement;
+import annotation.Element;
+import com.codeborne.selenide.SelenideElement;
 
-@MobileElement("экран")
+@Element("экран")
 public class View extends BaseElement {
 
-    public View(SelenideAppiumElement element) {
+    public View(SelenideElement element) {
         super(element);
     }
 }

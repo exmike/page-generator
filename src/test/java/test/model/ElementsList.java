@@ -1,13 +1,13 @@
 package test.model;
 
 import annotation.Action;
-import annotation.MobileElement;
+import annotation.Element;
 import com.codeborne.selenide.CollectionCondition;
 import com.codeborne.selenide.ElementsCollection;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 
-@MobileElement("лист")
+@Element("лист")
 @RequiredArgsConstructor
 public class ElementsList {
 
