@@ -22,6 +22,10 @@ public class Logger {
         messager.printMessage(Kind.ERROR, String.format(message, args));
     }
 
+    public void info(String message, Object... args) {
+        messager.printMessage(Kind.NOTE, String.format(message, args));
+    }
+
     public void warn(String message, Object... args) {
         messager.printMessage(Kind.WARNING, String.format(message, args));
     }

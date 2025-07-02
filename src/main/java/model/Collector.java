@@ -13,7 +13,7 @@ public class Collector {
 
     private static final Collector INSTANCE = new Collector();
 
-    private List<Element> element;
+    private List<Element> elements;
     private List<Page> pages;
     private List<VariableElement> baseScreenFields;
 
@@ -23,7 +23,7 @@ public class Collector {
 
     public String getStringElements() {
         StringBuilder sb = new StringBuilder();
-        for (Element element : this.element) {
+        for (Element element : this.elements) {
             sb.append(getElementTypeName(element)).append(WHITESPACE);
         }
         return sb.toString();
