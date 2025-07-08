@@ -4,14 +4,30 @@
 
     <groupId>ru.exmike</groupId>
     <artifactId>page-generator</artifactId>
-    <version>1.0.9</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
 
     <name>page-generator</name>
-    <url>http://maven.apache.org</url>
+    <description>Library for generating a page object</description>
+    <url>https://github.com/exmike</url>
+
+    <developers>
+        <developer>
+            <name>Efim Ilin</name>
+            <email>exmike@vk.com</email>
+            <organization>Personal</organization>
+            <organizationUrl>https://github.com/exmike</organizationUrl>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT </url>
+        </license>
+    </licenses>
 
     <properties>
-
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
