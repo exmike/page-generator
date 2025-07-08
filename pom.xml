@@ -77,6 +77,14 @@
         </dependency>
     </dependencies>
 
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>Github exmike Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/exmike/page-generator/</url>
+        </repository>
+    </distributionManagement>
+
     <build>
         <plugins>
             <plugin>
