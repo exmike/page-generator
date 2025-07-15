@@ -4,7 +4,7 @@
 
     <groupId>io.github.exmike</groupId>
     <artifactId>page-generator</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <packaging>jar</packaging>
 
     <name>page-generator</name>
@@ -54,7 +54,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.17.0</version>
+            <version>3.18.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -66,7 +66,7 @@
         <dependency>
             <groupId>com.codeborne</groupId>
             <artifactId>selenide-appium</artifactId>
-            <version>7.9.3</version>
+            <version>7.9.4</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
