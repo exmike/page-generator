@@ -1,6 +1,6 @@
 package annotation.generator;
 
-import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
+import static util.Utils.containsIgnoreCase;
 import annotation.generator.interfaces.MethodGenerator;
 import com.squareup.javapoet.MethodSpec;
 import java.util.List;

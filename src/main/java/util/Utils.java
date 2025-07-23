@@ -170,4 +170,16 @@ public class Utils {
         return !getSubstring(field.getSimpleName().toString(),
             elementName + "$").isEmpty();
     }
+
+    public static boolean containsIgnoreCase(String str, String search) {
+        int len = search.length();
+        int max = str.length() - len;
+
+        for (int i = 0; i <= max; i++) {
+            if (str.regionMatches(true, i, search, 0, len)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
