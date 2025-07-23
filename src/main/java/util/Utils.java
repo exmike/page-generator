@@ -171,6 +171,9 @@ public class Utils {
             elementName + "$").isEmpty();
     }
 
+    /*
+    Method from apache lang3
+     */
     public static boolean containsIgnoreCase(String str, String search) {
         int len = search.length();
         int max = str.length() - len;
@@ -182,4 +185,32 @@ public class Utils {
         }
         return false;
     }
+
+    /*
+    Method from apache lang3
+     */
+    public static String uncapitalize(final String str) {
+        final int strLen = str.length();
+        if (strLen == 0) {
+            return str;
+        }
+
+        final int firstCodePoint = str.codePointAt(0);
+        final int newCodePoint = Character.toLowerCase(firstCodePoint);
+        if (firstCodePoint == newCodePoint) {
+            // already capitalized
+            return str;
+        }
+
+        final int[] newCodePoints = new int[strLen];
+        int outOffset = 0;
+        newCodePoints[outOffset++] = newCodePoint;
+        for (int inOffset = Character.charCount(firstCodePoint); inOffset < strLen; ) {
+            final int codePoint = str.codePointAt(inOffset);
+            newCodePoints[outOffset++] = codePoint;
+            inOffset += Character.charCount(codePoint);
+        }
+        return new String(newCodePoints, 0, outOffset);
+    }
+
 }
