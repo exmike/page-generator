@@ -100,7 +100,6 @@ public class SpecsCreator {
             .addTypeVariables(getTypeParamsFromMethod(method.getTypeParameters()));
     }
 
-
     private Builder defaultMethodSpecBuilder(ExecutableElement method, VariableElement field, Page page,
         Element element) {
         return MethodSpec.methodBuilder(

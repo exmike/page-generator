@@ -4,12 +4,11 @@ import annotation.Action;
 import annotation.PageElement;
 import com.squareup.javapoet.ParameterSpec;
 import java.lang.annotation.Annotation;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.lang.model.element.AnnotationMirror;
+import java.util.stream.Collectors;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import model.Collector;
@@ -20,14 +19,11 @@ public class Utils {
     public static final String PACKAGE_NAME = "page.generated";
     public static final String WHITESPACE = " ";
 
-    //todo mb rework
     //[aboba], [kek] -> aboba, kek
     public static String formatParamListToString(List<ParameterSpec> parameterSpecs) {
         return parameterSpecs.stream()
-            .map(parameterSpec -> parameterSpec.name)
-            .toList()
-            .toString()
-            .replace("[", "").replace("]", "");
+            .map(spec -> spec.name)
+            .collect(Collectors.joining(", "));
     }
 
     /**
@@ -43,11 +39,9 @@ public class Utils {
     }
 
     public static String getFieldAnnotationValue(VariableElement field) {
-        if (field.getAnnotationMirrors().toString().contains(PageElement.class.getName())) {
-            return field.getAnnotation(PageElement.class).value();
-        } else {
-            return getAnnotationValue(field);
-        }
+        return field.getAnnotationMirrors().toString().contains(PageElement.class.getName())
+            ? field.getAnnotation(PageElement.class).value()
+            : getAnnotationValue(field);
     }
 
 
@@ -55,12 +49,7 @@ public class Utils {
      * Метод для проверки есть ли на классе специфическая аннотация
      */
     public static boolean isNotAnnotated(javax.lang.model.element.Element element, Class<? extends Annotation> clazz) {
-        for (AnnotationMirror annotation : element.getAnnotationMirrors()) {
-            if (annotation.getAnnotationType().toString().equals(clazz.getName())) {
-                return false;
-            }
-        }
-        return true;
+        return element.getAnnotation(clazz) == null;
     }
 
     /**
@@ -68,16 +57,6 @@ public class Utils {
      */
     public static String getElementTypeName(Element model) {
         return (((DeclaredType) model.getType()).asElement()).getSimpleName().toString();
-    }
-
-    /*
-    Метод для получения типа виджета из филда пейджи titleLabel -> Label
-    */
-    @Deprecated
-    public static String getElementNameFromField(VariableElement field) {
-        return Arrays.stream(field.getSimpleName().toString().split("(?=[A-Z])"))
-            .reduce((head, tail) -> tail)
-            .orElseThrow(() -> new RuntimeException("getElementNameFromField"));
     }
 
     public static void checkCorrectMethods(List<? extends javax.lang.model.element.Element> elements) {
@@ -102,11 +81,11 @@ public class Utils {
     Проверка на дубли методов, если есть оверрайд, то структура класса сгенерированного сломается
      */
     private static void checkDuplicates(List<? extends javax.lang.model.element.Element> elements) {
-        List<String> methodNames = elements.stream()
+        Set<String> methodNames = elements.stream()
             .map(Object::toString)
-            .toList();
+            .collect(Collectors.toSet());
 
-        if (methodNames.size() > new HashSet<>(methodNames).size()) {
+        if (elements.size() != methodNames.size()) {
             throw new RuntimeException(
                 "Найдены дубликаты методов скорее всего в наследнике BaseElement переопределен один из методов");
         }
@@ -137,7 +116,9 @@ public class Utils {
             result.append(matcher.group());
         }
 
-        return result.isEmpty() ? target : target.replace(result.toString(), text);
+        return result.isEmpty()
+            ? target
+            : target.replace(result.toString(), text);
     }
 
     /**
@@ -174,7 +155,7 @@ public class Utils {
     /*
     Method from apache lang3
      */
-    public static boolean containsIgnoreCase(String str, String search) {
+    public static boolean containsIgnoreCase(final String str, final String search) {
         int len = search.length();
         int max = str.length() - len;
 
