@@ -35,7 +35,7 @@ public class Utils {
             .filter(fields -> fields.getSimpleName().equals(field.getSimpleName()))
             .map(annotation -> annotation.getAnnotation(PageElement.class).value())
             .findFirst()
-            .orElseThrow(() -> new RuntimeException("Поле не объявлено в BaseScreen"));
+            .orElseThrow(() -> new RuntimeException("Field is not declared in BaseScreen"));
     }
 
     public static String getFieldAnnotationValue(VariableElement field) {
@@ -64,13 +64,13 @@ public class Utils {
         elements.forEach(method -> {
             if (isNotAnnotated(method, Action.class)) {
                 throw new RuntimeException(
-                    String.format("Метод с названием %s в классе %s должен быть с аннотацией Action",
+                    String.format("A method named %s in the %s class must have an Action annotation",
                         method.getSimpleName(), method.getEnclosingElement().getSimpleName().toString()));
             }
 
             if (method.getAnnotation(Action.class).value().isEmpty()) {
                 throw new RuntimeException(
-                    String.format("Метод с названием %s в классе %s в аннотации Action должен иметь не пустое значение",
+                    String.format("The method named %s in the %s class in the Action annotation must have a non-empty value",
                         method.getSimpleName(), method.getEnclosingElement().getSimpleName().toString())
                 );
             }
@@ -87,7 +87,7 @@ public class Utils {
 
         if (elements.size() != methodNames.size()) {
             throw new RuntimeException(
-                "Найдены дубликаты методов скорее всего в наследнике BaseElement переопределен один из методов");
+                "Duplicate methods were found, most likely one of the methods was redefined in the BaseElement heir.");
         }
     }
 
@@ -96,7 +96,7 @@ public class Utils {
      */
     public static <T> void validate(List<T> elements, Class<? extends Annotation> annotation) {
         if (elements.isEmpty()) {
-            throw new RuntimeException("Не нашли классов аннотированных " + annotation.getSimpleName());
+            throw new RuntimeException("We did not find any annotated classes " + annotation.getSimpleName());
         }
     }
 

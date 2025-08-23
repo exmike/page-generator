@@ -39,7 +39,7 @@ public class ElementCollectorImpl implements ElementCollector {
             .forEach(element -> {
                 if (element.getAnnotation(annotation.Element.class).value().isEmpty()) {
                     throw new RuntimeException(
-                        String.format("Значение в аннотации Element %s не должно быть пустым",
+                        String.format("Value in the annotation Element %s must not be empty",
                             element.getSimpleName()));
                 }
                 List<ExecutableElement> publicElementMethods = new ArrayList<>(getPublicMethods(element));
@@ -88,7 +88,7 @@ public class ElementCollectorImpl implements ElementCollector {
         log.debug("Number of BaseElement annotations found: " + baseElementCount);
         if (baseElementCount != 1) {
             throw new RuntimeException(
-                "Ожидается, что будет одна аннотация BaseElement но их: " + baseElementCount);
+                "Expected only one BaseElement annotation but their: " + baseElementCount);
         }
     }
 }
