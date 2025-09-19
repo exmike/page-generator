@@ -31,10 +31,10 @@ public class PageCollectorImpl implements PageCollector {
         log.debug("Starting collectPages");
         List<Page> pages = this.roundEnv.getElementsAnnotatedWith(PageObject.class)
             .stream()
-            .peek(e -> log.debug(e.toString() + "PEEEEK"))
             .map(page -> {
                 List<VariableElement> fields = ElementFilter.fieldsIn(page.getEnclosedElements())
                     .stream()
+                    .peek(e -> log.debug(e.toString() + "PEEEEK"))
                     .filter(e -> e.getModifiers().contains(Modifier.PROTECTED))
                     .toList();
                 List<ExecutableElement> methods = ElementFilter.methodsIn(page.getEnclosedElements());
@@ -50,18 +50,14 @@ public class PageCollectorImpl implements PageCollector {
 
     private void checkCorrectFields(List<? extends javax.lang.model.element.Element> elements,
         javax.lang.model.element.Element page) {
-        List<String> basePageElementFields = collector.getBaseScreenFields().stream()
-            .map(field -> field.getSimpleName().toString())
-            .toList();
 
         elements.forEach(field -> {
-            boolean isNotBasePageField = !basePageElementFields.contains(field.getSimpleName().toString());
 
-            if (isNotBasePageField && isNotAnnotated(field, PageElement.class)) {
+            if (isNotAnnotated(field, PageElement.class)) {
                 throw new RuntimeException(String.format("Поле %s в классе %s должно быть c аннотацией PageElement",
                     field, page.getSimpleName()));
             }
-            if (isNotBasePageField && field.getAnnotation(PageElement.class).value().isEmpty()) {
+            if (field.getAnnotation(PageElement.class).value().isEmpty()) {
                 throw new RuntimeException(
                     String.format("Поле %s в классе %s в аннотации PageElement должно иметь не пустое значение",
                         field, page.getSimpleName()));

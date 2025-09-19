@@ -3,7 +3,6 @@ package model;
 import static util.Utils.WHITESPACE;
 import static util.Utils.getElementTypeName;
 import java.util.List;
-import javax.lang.model.element.VariableElement;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,7 +14,6 @@ public class Collector {
 
     private List<Element> elements;
     private List<Page> pages;
-    private List<VariableElement> baseScreenFields;
 
     private Collector() {
 

@@ -1,7 +1,6 @@
 package annotation.generator;
 
 import static util.Utils.PACKAGE_NAME;
-import annotation.generator.interfaces.BaseScreenFieldCollector;
 import annotation.generator.interfaces.ClassGenerator;
 import annotation.generator.interfaces.ElementCollector;
 import annotation.generator.interfaces.MethodGenerator;
@@ -26,15 +25,12 @@ public class PageGenerator {
     private final MethodGenerator methodGenerator;
     private final ClassGenerator classGenerator;
     private final ScreenManagerGenerator screenManagerGenerator;
-    private final BaseScreenFieldCollector baseScreenFieldCollector;
-
 
     public PageGenerator(Logger log, RoundEnvironment roundEnv, SpecsCreator specsCreator,
         ProcessingEnvironment processingEnvironment) {
         this.log = log;
         this.processingEnvironment = processingEnvironment;
 
-        this.baseScreenFieldCollector = new BaseScreenFieldCollectorImpl(roundEnv, log, collector);
         this.elementCollector = new ElementCollectorImpl(roundEnv, log, collector);
         this.pageCollector = new PageCollectorImpl(roundEnv, log, collector);
         this.methodGenerator = new MethodGeneratorImpl(specsCreator, log, collector);
@@ -50,8 +46,6 @@ public class PageGenerator {
         log.info("Starting generatePages");
         //собрали доступные Element'ы
         elementCollector.collectElements();
-        //собрали доступные поля в BasePage
-        baseScreenFieldCollector.collectBaseScreenFields();
         //собрали доступные PageObject'ы
         pageCollector.collectPages();
         //сгенерировали для каждой Page методы
