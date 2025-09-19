@@ -119,7 +119,7 @@ public class SpecsCreator {
                 field.getSimpleName().toString() + "_" + method.getSimpleName().toString())
             .addModifiers(Modifier.PUBLIC)
             .addAnnotation(stepAnnotationSpec(method, field, page, element))
-            .returns(ClassName.get(PACKAGE_NAME, page.getPageName()));
+            .returns(ClassName.get(PACKAGE_NAME, page.getPageName() + "Gen"));
     }
 
     private List<TypeVariableName> getTypeParamsFromMethod(List<? extends TypeParameterElement> typeParameterElements) {
