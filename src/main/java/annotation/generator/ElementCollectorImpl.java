@@ -5,6 +5,7 @@ import static util.Utils.validate;
 import annotation.BaseElement;
 import annotation.generator.interfaces.ElementCollector;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.ExecutableElement;
@@ -38,7 +39,7 @@ public class ElementCollectorImpl implements ElementCollector {
             .forEach(element -> {
                 if (element.getAnnotation(annotation.Element.class).value().isEmpty()) {
                     throw new RuntimeException(
-                        String.format("Значение в аннотации Element %s не должно быть пустым",
+                        String.format("Value in the annotation Element %s must not be empty",
                             element.getSimpleName()));
                 }
                 List<ExecutableElement> publicElementMethods = new ArrayList<>(getPublicMethods(element));
@@ -62,15 +63,11 @@ public class ElementCollectorImpl implements ElementCollector {
     Получение всех методов из класса аннотированного BaseElement
      */
     private List<ExecutableElement> getBaseMethods() {
-        List<ExecutableElement> baseMethods = new ArrayList<>();
-        try {
-            baseMethods = getPublicMethods(roundEnv.getElementsAnnotatedWith(BaseElement.class)
-                .stream().toList().get(0));
-            log.debug("Base methods collected successfully");
-        } catch (Exception e) {
-            log.error("Error collecting base methods: " + e.getMessage());
-        }
-        return baseMethods;
+        return roundEnv.getElementsAnnotatedWith(BaseElement.class)
+            .stream()
+            .findFirst()
+            .map(this::getPublicMethods)
+            .orElse(Collections.emptyList());
     }
 
     /*
@@ -91,7 +88,7 @@ public class ElementCollectorImpl implements ElementCollector {
         log.debug("Number of BaseElement annotations found: " + baseElementCount);
         if (baseElementCount != 1) {
             throw new RuntimeException(
-                "Ожидается, что будет одна аннотация BaseElement но их: " + baseElementCount);
+                "Expected only one BaseElement annotation but their: " + baseElementCount);
         }
     }
 }

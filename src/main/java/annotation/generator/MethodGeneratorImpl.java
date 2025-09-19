@@ -86,7 +86,7 @@ public class MethodGeneratorImpl implements MethodGenerator {
     private RuntimeException createFieldTypeException(VariableElement field, Page page) {
         return new RuntimeException(
             String.format(
-                "Не удалось определить тип поля %s в классе %s. Доступные типы: %s",
+                "The %s field type in the %s class could not be determined. Available types: %s",
                 field.getSimpleName(), page.getPageName(), collector.getStringElements()
             )
         );

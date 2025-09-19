@@ -52,12 +52,12 @@ public class PageCollectorImpl implements PageCollector {
             boolean isNotBasePageField = !basePageElementFields.contains(field.getSimpleName().toString());
 
             if (isNotBasePageField && isNotAnnotated(field, PageElement.class)) {
-                throw new RuntimeException(String.format("Поле %s в классе %s должно быть c аннотацией PageElement",
+                throw new RuntimeException(String.format("Field %s in class %s must be with annotation PageElement",
                     field, page.getSimpleName()));
             }
             if (isNotBasePageField && field.getAnnotation(PageElement.class).value().isEmpty()) {
                 throw new RuntimeException(
-                    String.format("Поле %s в классе %s в аннотации PageElement должно иметь не пустое значение",
+                    String.format("Field %s in class %s in annotation PageElement must have not null value",
                         field, page.getSimpleName()));
             }
         });
