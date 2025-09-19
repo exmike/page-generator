@@ -30,22 +30,13 @@ public class MethodGeneratorImpl implements MethodGenerator {
         фильтруем по методам, которые содержат в названии widget
          */
         pages.forEach(page -> {
-//            page.getMethods().stream()
-//                .filter(method -> containsIgnoreCase(method.toString(), "widget"))
-//                .forEach(method -> page.addSpec(specsCreator.generateInnerScreenMethods(method)));
             /*
             Генерация методов на основе доступных полей
              */
             page.getFields().forEach(field -> {
+                log.debug(field.getSimpleName().toString() + "FIELDNAME");
                 // Генерация методов на основе доступных полей
                 generateMethodSpecToPage(field, page);
-                //Генерация методов, которые будут возвращать поля класса(геттеры полей)
-//                page.addSpec(specsCreator.generateGetMethods(field));
-                //Генерирует методы isPresent для каждого поля
-//                if ((!containsIgnoreCase(field.getSimpleName().toString(), "elementsList"))) {
-//                    page.addSpec(specsCreator.generateIsPresentMethods(field));
-//                    page.addSpec(specsCreator.generateIsPresentMethodsWithDuration(field));
-//                }
             });
         });
         log.debug("Finished generateMethodsToPage");
@@ -56,7 +47,7 @@ public class MethodGeneratorImpl implements MethodGenerator {
      */
     private void generateMethodSpecToPage(VariableElement field, Page page) {
         Element element = findElementForField(field, page);
-
+        log.debug(element.getMethods().toString() + "123456");
         element.getMethods().forEach(method -> {
             MethodSpec methodSpec = createMethodSpec(method, field, page, element);
             page.addSpec(methodSpec);

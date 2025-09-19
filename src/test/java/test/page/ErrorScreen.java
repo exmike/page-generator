@@ -6,7 +6,7 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 
 @PageObject
-public class ErrorScreen extends BaseScreen {
+public class ErrorScreen {
 
     private Page page;
 
