@@ -8,7 +8,6 @@ import com.microsoft.playwright.Page;
 @PageObject
 public class ErrorScreen extends BaseScreen {
 
-
     private Page page;
 
     public ErrorScreen(Page page) {
