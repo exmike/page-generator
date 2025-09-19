@@ -31,6 +31,7 @@ public class PageCollectorImpl implements PageCollector {
         log.debug("Starting collectPages");
         List<Page> pages = this.roundEnv.getElementsAnnotatedWith(PageObject.class)
             .stream()
+            .peek(e -> log.debug(e.toString() + "PEEEEK"))
             .map(page -> {
                 List<VariableElement> fields = ElementFilter.fieldsIn(page.getEnclosedElements())
                     .stream()
@@ -38,7 +39,8 @@ public class PageCollectorImpl implements PageCollector {
                     .toList();
                 List<ExecutableElement> methods = ElementFilter.methodsIn(page.getEnclosedElements());
                 checkCorrectFields(fields, page);
-                return new Page(page.getSimpleName().toString(),page.asType(), fields, methods);
+                log.debug(fields.size() + "SIZEEEEE");
+                return new Page(page.getSimpleName().toString(), page.asType(), fields, methods);
             }).toList();
         validate(pages, PageObject.class);
         collector.setPages(pages);

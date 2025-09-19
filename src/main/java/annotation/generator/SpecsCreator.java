@@ -142,7 +142,6 @@ public class SpecsCreator {
      */
     private List<FieldSpec> generateFieldsSpecByPage(List<VariableElement> pageFields) {
         return pageFields.stream()
-            .filter(field -> field.getAnnotationMirrors().size() != 1)
             .map(this::generateFieldSpecFromField)
             .toList();
     }
