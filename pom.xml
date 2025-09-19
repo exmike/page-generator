@@ -4,7 +4,7 @@
 
     <groupId>io.github.exmike</groupId>
     <artifactId>page-generator</artifactId>
-    <version>2.0.2-playwright</version>
+    <version>2.0.3-playwright</version>
     <packaging>jar</packaging>
 
     <name>page-generator</name>

@@ -35,6 +35,9 @@ public class PageCollectorImpl implements PageCollector {
                 List<VariableElement> fields = ElementFilter.fieldsIn(page.getEnclosedElements())
                     .stream()
                     .peek(e -> log.debug(e.toString() + "PEEEEK"))
+                    .peek(e -> log.debug(e.getModifiers().toString() + "PEEEEK1"))
+                    .peek(e -> log.debug(e.getModifiers() + "PEEEEK2"))
+                    .peek(e -> log.debug(e.getModifiers().size() + "PEEEEK3"))
                     .filter(e -> e.getModifiers().contains(Modifier.PROTECTED))
                     .toList();
                 List<ExecutableElement> methods = ElementFilter.methodsIn(page.getEnclosedElements());
