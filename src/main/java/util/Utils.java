@@ -1,7 +1,6 @@
 package util;
 
 import annotation.Action;
-import annotation.PageElement;
 import com.squareup.javapoet.ParameterSpec;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
@@ -12,7 +11,6 @@ import java.util.regex.Pattern;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
-import model.Collector;
 import model.Element;
 
 public class Utils {
@@ -29,27 +27,6 @@ public class Utils {
             .toString()
             .replace("[", "").replace("]", "");
     }
-
-    /**
-     * Костыль для заполнения value в степе аллюра Если элемент не помечен PageElement - ищем этот же элемент в
-     * BaseScreen и берем value у него
-     */
-    public static String getAnnotationValue(VariableElement field) {
-        return Collector.getInstance().getBaseScreenFields().stream()
-            .filter(fields -> fields.getSimpleName().equals(field.getSimpleName()))
-            .map(annotation -> annotation.getAnnotation(PageElement.class).value())
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("Поле не объявлено в BaseScreen"));
-    }
-
-    public static String getFieldAnnotationValue(VariableElement field) {
-        if (field.getAnnotationMirrors().toString().contains(PageElement.class.getName())) {
-            return field.getAnnotation(PageElement.class).value();
-        } else {
-            return getAnnotationValue(field);
-        }
-    }
-
 
     /**
      * Метод для проверки есть ли на классе специфическая аннотация
