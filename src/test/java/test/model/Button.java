@@ -2,12 +2,12 @@ package test.model;
 
 import annotation.Action;
 import annotation.Element;
-import com.codeborne.selenide.SelenideElement;
+import com.microsoft.playwright.Locator;
 
 @Element("кнопка")
 public class Button extends BaseElement {
 
-    public Button(SelenideElement element) {
+    public Button(Locator element) {
         super(element);
     }
 
@@ -18,6 +18,6 @@ public class Button extends BaseElement {
 
     @Action("Дважды Нажимаем на <elementName>")
     public void doubleClick() {
-        element.doubleClick();
+        element.dblclick();
     }
 }

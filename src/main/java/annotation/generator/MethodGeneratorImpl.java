@@ -1,6 +1,5 @@
 package annotation.generator;
 
-import static util.Utils.containsIgnoreCase;
 import annotation.generator.interfaces.MethodGenerator;
 import com.squareup.javapoet.MethodSpec;
 import java.util.List;
@@ -31,9 +30,9 @@ public class MethodGeneratorImpl implements MethodGenerator {
         фильтруем по методам, которые содержат в названии widget
          */
         pages.forEach(page -> {
-            page.getMethods().stream()
-                .filter(method -> containsIgnoreCase(method.toString(), "widget"))
-                .forEach(method -> page.addSpec(specsCreator.generateInnerScreenMethods(method)));
+//            page.getMethods().stream()
+//                .filter(method -> containsIgnoreCase(method.toString(), "widget"))
+//                .forEach(method -> page.addSpec(specsCreator.generateInnerScreenMethods(method)));
             /*
             Генерация методов на основе доступных полей
              */
@@ -41,12 +40,12 @@ public class MethodGeneratorImpl implements MethodGenerator {
                 // Генерация методов на основе доступных полей
                 generateMethodSpecToPage(field, page);
                 //Генерация методов, которые будут возвращать поля класса(геттеры полей)
-                page.addSpec(specsCreator.generateGetMethods(field));
+//                page.addSpec(specsCreator.generateGetMethods(field));
                 //Генерирует методы isPresent для каждого поля
-                if ((!containsIgnoreCase(field.getSimpleName().toString(), "elementsList"))) {
-                    page.addSpec(specsCreator.generateIsPresentMethods(field));
-                    page.addSpec(specsCreator.generateIsPresentMethodsWithDuration(field));
-                }
+//                if ((!containsIgnoreCase(field.getSimpleName().toString(), "elementsList"))) {
+//                    page.addSpec(specsCreator.generateIsPresentMethods(field));
+//                    page.addSpec(specsCreator.generateIsPresentMethodsWithDuration(field));
+//                }
             });
         });
         log.debug("Finished generateMethodsToPage");

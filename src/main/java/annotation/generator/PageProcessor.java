@@ -36,7 +36,7 @@ public class PageProcessor extends AbstractProcessor {
             /*
             Во втором раунде генерируется ScreenManager на основе ранее сгенерированных классов
              */
-            case 2 -> pageGenerator.generateScreenManager();
+//            case 2 -> pageGenerator.generateScreenManager();
         }
 
         return true;

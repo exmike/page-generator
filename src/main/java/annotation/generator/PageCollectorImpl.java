@@ -8,6 +8,7 @@ import annotation.generator.interfaces.PageCollector;
 import java.util.List;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementFilter;
 import lombok.RequiredArgsConstructor;
@@ -31,10 +32,13 @@ public class PageCollectorImpl implements PageCollector {
         List<Page> pages = this.roundEnv.getElementsAnnotatedWith(PageObject.class)
             .stream()
             .map(page -> {
-                List<VariableElement> fields = ElementFilter.fieldsIn(page.getEnclosedElements());
+                List<VariableElement> fields = ElementFilter.fieldsIn(page.getEnclosedElements())
+                    .stream()
+                    .filter(e -> e.getModifiers().contains(Modifier.PROTECTED))
+                    .toList();
                 List<ExecutableElement> methods = ElementFilter.methodsIn(page.getEnclosedElements());
                 checkCorrectFields(fields, page);
-                return new Page(page.getSimpleName().toString(), fields, methods);
+                return new Page(page.getSimpleName().toString(),page.asType(), fields, methods);
             }).toList();
         validate(pages, PageObject.class);
         collector.setPages(pages);
