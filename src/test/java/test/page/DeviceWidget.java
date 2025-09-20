@@ -1,8 +1,6 @@
 package test.page;
 
-import annotation.PageElement;
 import annotation.PageObject;
-import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 
 @PageObject
@@ -14,7 +12,7 @@ public class DeviceWidget {
         this.page = page;
     }
 
-    @PageElement("девайсы")
-    protected Locator deviceButton = page.locator("kek");
+//    @PageElement("девайсы")
+//    protected Locator deviceButton = page.locator("kek");
 
 }

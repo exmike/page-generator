@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.Name;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import model.Element;
@@ -167,6 +168,7 @@ public class Utils {
     Method from apache lang3
      */
     public static String uncapitalize(final String str) {
+
         final int strLen = str.length();
         if (strLen == 0) {
             return str;
@@ -188,6 +190,22 @@ public class Utils {
             inOffset += Character.charCount(codePoint);
         }
         return new String(newCodePoints, 0, outOffset);
+    }
+
+    public static String capitalize(final String str) {
+        final int firstCodepoint = str.codePointAt(0);
+        final int newCodePoint = Character.toTitleCase(firstCodepoint);
+        if (firstCodepoint == newCodePoint) {
+            // already capitalized
+            return str;
+        }
+        final int[] newCodePoints = str.codePoints().toArray();
+        newCodePoints[0] = newCodePoint; // copy the first code point
+        return new String(newCodePoints, 0, newCodePoints.length);
+    }
+
+    public static String addGetToString(Name name) {
+        return "get" + capitalize(name.toString()) + "()";
     }
 
 }

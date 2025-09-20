@@ -63,7 +63,7 @@ public class SpecsCreator {
         Element element) {
         Builder builder = defaultMethodSpecBuilder(method, field, page, element);
         PageElement pageElement = field.getAnnotation(PageElement.class);
-        String actionStatement = String.format("new $T(%s).%s()", field.getSimpleName(), method.getSimpleName());
+        String actionStatement = String.format("new $T(%s).%s()", Utils.addGetToString(field.getSimpleName()), method.getSimpleName());
         return buildStatements(method, field, element, builder, pageElement, actionStatement);
     }
 
@@ -79,7 +79,7 @@ public class SpecsCreator {
             .addParameters(parameterSpecs);
         PageElement pageElement = field.getAnnotation(PageElement.class);
         String actionStatement = String.format("new $T(%s).%s(" + Utils.formatParamListToString(
-            parameterSpecs) + ")", field.getSimpleName(), method.getSimpleName());
+            parameterSpecs) + ")", Utils.addGetToString(field.getSimpleName()), method.getSimpleName());
         return buildStatements(method, field, element, builder, pageElement, actionStatement);
     }
 
