@@ -6,11 +6,14 @@ import annotation.PageElement;
 import annotation.PageObject;
 import annotation.generator.interfaces.PageCollector;
 import java.util.List;
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementFilter;
+import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
 import lombok.RequiredArgsConstructor;
 import model.Collector;
 import model.Page;
@@ -22,6 +25,7 @@ public class PageCollectorImpl implements PageCollector {
     private final RoundEnvironment roundEnv;
     private final Logger log;
     private final Collector collector;
+    private final ProcessingEnvironment processingEnvironment;
 
     /**
      * Метод собирает все пейджы, которые проаннотированны PageObject'ом, собирая public поля находящиеся в них
@@ -34,21 +38,23 @@ public class PageCollectorImpl implements PageCollector {
             .map(page -> {
                 List<VariableElement> fields = ElementFilter.fieldsIn(page.getEnclosedElements())
                     .stream()
-                    .peek(e -> log.debug(e.toString() + "PEEEEK"))
-                    .peek(e -> log.debug(e.getModifiers().toString() + "PEEEEK1"))
-                    .peek(e -> log.debug(e.getModifiers() + "PEEEEK2"))
-                    .peek(e -> log.debug(e.getModifiers().size() + "PEEEEK3"))
-                    .filter(e -> e.getModifiers().contains(Modifier.PROTECTED))
+                    .filter(e -> isLocatorField(e, processingEnvironment))
                     .toList();
                 List<ExecutableElement> methods = ElementFilter.methodsIn(page.getEnclosedElements());
                 checkCorrectFields(fields, page);
-                log.debug(fields.size() + "SIZEEEEE");
                 return new Page(page.getSimpleName().toString(), page.asType(), fields, methods);
             }).toList();
         validate(pages, PageObject.class);
         collector.setPages(pages);
         log.debug("Finished collectPages");
         return pages;
+    }
+
+    private boolean isLocatorField(VariableElement field, ProcessingEnvironment processingEnv) {
+        Elements elements = processingEnv.getElementUtils();
+        Types types = processingEnv.getTypeUtils();
+        TypeElement locatorElement = elements.getTypeElement("com.microsoft.playwright.Locator");
+        return types.isAssignable(field.asType(), locatorElement.asType());
     }
 
     private void checkCorrectFields(List<? extends javax.lang.model.element.Element> elements,

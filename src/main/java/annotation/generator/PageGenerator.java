@@ -32,7 +32,7 @@ public class PageGenerator {
         this.processingEnvironment = processingEnvironment;
 
         this.elementCollector = new ElementCollectorImpl(roundEnv, log, collector);
-        this.pageCollector = new PageCollectorImpl(roundEnv, log, collector);
+        this.pageCollector = new PageCollectorImpl(roundEnv, log, collector, processingEnvironment);
         this.methodGenerator = new MethodGeneratorImpl(specsCreator, log, collector);
         this.classGenerator = new ClassGeneratorImpl(specsCreator, log);
         this.screenManagerGenerator = new ScreenManagerGeneratorImpl(roundEnv, specsCreator, processingEnvironment,

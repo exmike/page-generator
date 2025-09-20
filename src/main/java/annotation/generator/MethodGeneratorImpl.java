@@ -47,7 +47,6 @@ public class MethodGeneratorImpl implements MethodGenerator {
      */
     private void generateMethodSpecToPage(VariableElement field, Page page) {
         Element element = findElementForField(field, page);
-        log.debug(element.getMethods().toString() + "123456");
         element.getMethods().forEach(method -> {
             MethodSpec methodSpec = createMethodSpec(method, field, page, element);
             page.addSpec(methodSpec);
