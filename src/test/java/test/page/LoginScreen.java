@@ -12,9 +12,6 @@ public class LoginScreen {
         this.page = page;
     }
 
-//    @PageElement(value = "лайк")
-//    protected Locator likeButton;
-//
 //    @PageElement(value = "тайтл")
 //    protected Locator titleLabel;
 //
