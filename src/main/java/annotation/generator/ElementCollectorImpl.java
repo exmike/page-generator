@@ -11,17 +11,14 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
-import lombok.RequiredArgsConstructor;
 import model.Collector;
 import model.Element;
 import util.Logger;
 
-@RequiredArgsConstructor
-public class ElementCollectorImpl implements ElementCollector {
-
-    private final RoundEnvironment roundEnv;
-    private final Logger log;
-    private final Collector collector;
+public record ElementCollectorImpl(
+    RoundEnvironment roundEnv,
+    Logger log,
+    Collector collector) implements ElementCollector {
 
     /**
      * Метод, который собирает все элементы проаннотированные Element и к каждому Element добавляет все методы из

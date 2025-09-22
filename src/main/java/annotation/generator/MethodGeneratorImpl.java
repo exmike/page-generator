@@ -5,19 +5,16 @@ import com.squareup.javapoet.MethodSpec;
 import java.util.List;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
-import lombok.RequiredArgsConstructor;
 import model.Collector;
 import model.Element;
 import model.Page;
 import util.Logger;
 import util.Utils;
 
-@RequiredArgsConstructor
-public class MethodGeneratorImpl implements MethodGenerator {
-
-    private final SpecsCreator specsCreator;
-    private final Logger log;
-    private final Collector collector;
+public record MethodGeneratorImpl(
+    SpecsCreator specsCreator,
+    Logger log,
+    Collector collector) implements MethodGenerator {
 
     /*
     К каждой page генерируется пачка методов на основе доступных Element'ов
@@ -34,7 +31,6 @@ public class MethodGeneratorImpl implements MethodGenerator {
             Генерация методов на основе доступных полей
              */
             page.getFields().forEach(field -> {
-                log.debug(field.getSimpleName().toString() + "FIELDNAME");
                 // Генерация методов на основе доступных полей
                 generateMethodSpecToPage(field, page);
             });

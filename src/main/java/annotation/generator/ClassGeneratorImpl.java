@@ -3,15 +3,10 @@ package annotation.generator;
 import annotation.generator.interfaces.ClassGenerator;
 import com.squareup.javapoet.TypeSpec;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import model.Page;
 import util.Logger;
 
-@RequiredArgsConstructor
-public class ClassGeneratorImpl implements ClassGenerator {
-
-    private final SpecsCreator specsCreator;
-    private final Logger log;
+public record ClassGeneratorImpl(SpecsCreator specsCreator, Logger log) implements ClassGenerator {
 
     /*
     Метод для генерации всех классов на основе собранных объектов Page

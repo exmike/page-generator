@@ -8,24 +8,22 @@ import annotation.generator.interfaces.PageCollector;
 import java.util.List;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
-import lombok.RequiredArgsConstructor;
 import model.Collector;
 import model.Page;
 import util.Logger;
 
-@RequiredArgsConstructor
-public class PageCollectorImpl implements PageCollector {
-
-    private final RoundEnvironment roundEnv;
-    private final Logger log;
-    private final Collector collector;
-    private final ProcessingEnvironment processingEnvironment;
+public record PageCollectorImpl(
+    RoundEnvironment roundEnv,
+    Logger log,
+    Collector collector,
+    ProcessingEnvironment processingEnvironment) implements PageCollector {
 
     /**
      * Метод собирает все пейджы, которые проаннотированны PageObject'ом, собирая public поля находящиеся в них
@@ -57,8 +55,7 @@ public class PageCollectorImpl implements PageCollector {
         return types.isAssignable(field.asType(), locatorElement.asType());
     }
 
-    private void checkCorrectFields(List<? extends javax.lang.model.element.Element> elements,
-        javax.lang.model.element.Element page) {
+    private void checkCorrectFields(List<? extends Element> elements, Element page) {
 
         elements.forEach(field -> {
 
