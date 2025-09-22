@@ -68,6 +68,23 @@ public class SpecsCreator {
     }
 
     /*
+    Генерирует вложенные методы для внутренних инициализаций пейджей
+    */
+    public MethodSpec generateInnerScreenMethods(ExecutableElement element) {
+        /*
+        test.page.LoginScreen -> LoginScreen
+         */
+        String className = ((DeclaredType) element.getReturnType())
+            .asElement().getSimpleName().toString();
+        ClassName type = ClassName.get(PACKAGE_NAME, className);
+        return MethodSpec.methodBuilder(element.getSimpleName().toString())
+            .addModifiers(Modifier.PUBLIC)
+            .returns(type)
+            .addStatement("return new $T(page)", type)
+            .build();
+    }
+
+    /*
     Генерирует метод спеку с параметрами
     При наличии у аннотации PageElement ненулевого значения timeout
     дополнительно будет сгенерирована строка с ожиданием, указанным в параметре timeout

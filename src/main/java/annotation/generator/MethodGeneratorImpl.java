@@ -29,8 +29,8 @@ public record MethodGeneratorImpl(
          */
         pages.forEach(page -> {
             page.getMethods().stream()
-                .filter(method -> containsIgnoreCase(method.toString(), "widget"));
-//                .forEach(method -> page.addSpec(specsCreator.generate));
+                .filter(method -> containsIgnoreCase(method.toString(), "widget"))
+                .forEach(method -> page.addSpec(specsCreator.generateInnerScreenMethods(method)));
             /*
             Генерация методов на основе доступных полей
              */

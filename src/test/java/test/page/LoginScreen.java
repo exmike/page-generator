@@ -15,4 +15,8 @@ public class LoginScreen {
 //    @PageElement(value = "тайтл")
 //    protected Locator titleLabel;
 //
+//    public DeviceWidget deviceWidget() {
+//        return new DeviceWidget(page);
+//    }
+
 }
