@@ -205,7 +205,7 @@ public class Utils {
     }
 
     public static String addGetToString(Name name) {
-        return "get" + capitalize(name.toString()) + "()";
+        return "super.get" + capitalize(name.toString()) + "()";
     }
 
 }

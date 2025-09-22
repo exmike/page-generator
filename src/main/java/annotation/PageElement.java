@@ -19,5 +19,6 @@ public @interface PageElement {
     Если значение выставлено, то к каждому из методов будет дополнительно сгенерировано
     выставленное ожидание, указывается в секундах.
      */
-    int timeout() default 0;
+//    @Deprecated
+//    int timeout() default 0;
 }

@@ -33,6 +33,8 @@ public record MethodGeneratorImpl(
             page.getFields().forEach(field -> {
                 // Генерация методов на основе доступных полей
                 generateMethodSpecToPage(field, page);
+                //Генерация методов, которые будут возвращать поля класса(геттеры полей)
+                page.addSpec(specsCreator.generateGetMethods(field));
             });
         });
         log.debug("Finished generateMethodsToPage");
