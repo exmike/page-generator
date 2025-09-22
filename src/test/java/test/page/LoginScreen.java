@@ -1,6 +1,8 @@
 package test.page;
 
+import annotation.PageElement;
 import annotation.PageObject;
+import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 
 @PageObject
@@ -11,14 +13,11 @@ public class LoginScreen {
     public LoginScreen(Page page){
         this.page = page;
     }
-//    @PageElement(value = "лайк")
-//    protected Locator likeButton;
-//
-//    @PageElement(value = "тайтл")
-//    protected Locator titleLabel;
 
-//    public DeviceWidget deviceWidget() {
-//        return screen(DeviceWidget.class);
-//    }
+    @PageElement(value = "лайк")
+    protected Locator likeButton;
+
+    @PageElement(value = "тайтл")
+    protected Locator titleLabel;
 
 }
