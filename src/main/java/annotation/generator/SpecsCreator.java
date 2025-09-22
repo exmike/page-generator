@@ -85,19 +85,7 @@ public class SpecsCreator {
 
     private Builder buildStatements(ExecutableElement method, VariableElement field, Element element,
         Builder builder, PageElement pageElement, String actionStatement) {
-        //Deprecated неактуальные таймауты
-//        if (pageElement != null
-//            && pageElement.timeout() != 0
-//            && !containsIgnoreCase(method.getSimpleName().toString(), "wait")) {
-//
-//            builder.addStatement(
-//                String.format("new $T(%s).waitElement($T.ofSeconds(%d))", field.getSimpleName(), pageElement.timeout()),
-//                element.getType(), Duration.class);
-//            builder.addStatement(actionStatement, element.getType());
-//
-//        } else {
             builder.addStatement(actionStatement, element.getType());
-//        }
         return builder.addStatement("return this");
     }
 
@@ -229,7 +217,7 @@ public class SpecsCreator {
     Генерирует методы для возможности вернуть поле класса
      */
     public MethodSpec generateGetMethods(VariableElement element) {
-        return MethodSpec.methodBuilder(element.getSimpleName().toString() + "_get")
+        return MethodSpec.methodBuilder("get" + Utils.capitalize(element.getSimpleName().toString()))
             .addModifiers(Modifier.PUBLIC)
             .returns(TypeName.get(element.asType()))
             .addStatement("return super.get" + Utils.capitalize(element.getSimpleName().toString()) + "()")
@@ -239,6 +227,7 @@ public class SpecsCreator {
     /*
     Генерирует методы isPresent для каждого поля
      */
+    @Deprecated
     public MethodSpec generateIsPresentMethods(VariableElement element) {
         return MethodSpec.methodBuilder(element.getSimpleName().toString() + "_isPresent")
             .addModifiers(Modifier.PUBLIC)
@@ -250,6 +239,7 @@ public class SpecsCreator {
     /*
     Генерирует методы isPresent с duration для каждого поля
     */
+    @Deprecated
     public MethodSpec generateIsPresentMethodsWithDuration(VariableElement element) {
         return MethodSpec.methodBuilder(element.getSimpleName().toString() + "_isPresent")
             .addParameter(Duration.class, "duration")
