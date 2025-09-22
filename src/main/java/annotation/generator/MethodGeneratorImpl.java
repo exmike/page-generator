@@ -1,5 +1,6 @@
 package annotation.generator;
 
+import static util.Utils.containsIgnoreCase;
 import annotation.generator.interfaces.MethodGenerator;
 import com.squareup.javapoet.MethodSpec;
 import java.util.List;
@@ -27,6 +28,9 @@ public record MethodGeneratorImpl(
         фильтруем по методам, которые содержат в названии widget
          */
         pages.forEach(page -> {
+            page.getMethods().stream()
+                .filter(method -> containsIgnoreCase(method.toString(), "widget"));
+//                .forEach(method -> page.addSpec(specsCreator.generate));
             /*
             Генерация методов на основе доступных полей
              */
