@@ -17,7 +17,7 @@ public class Page {
     private List<MethodSpec> generatedMethodSpecs;
     private List<ExecutableElement> methods;
 
-    public Page(String pageName,TypeMirror type, List<VariableElement> fields, List<ExecutableElement> methods) {
+    public Page(String pageName, TypeMirror type, List<VariableElement> fields, List<ExecutableElement> methods) {
         this.pageName = pageName;
         this.type = type;
         this.fields = fields;
