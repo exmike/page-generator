@@ -234,7 +234,7 @@ public class SpecsCreator {
     Генерирует методы для возможности вернуть поле класса
      */
     public MethodSpec generateGetMethods(VariableElement element) {
-        return MethodSpec.methodBuilder("get" + Utils.capitalize(element.getSimpleName().toString()))
+        return MethodSpec.methodBuilder(element.getSimpleName().toString() + "_get")
             .addModifiers(Modifier.PUBLIC)
             .returns(TypeName.get(element.asType()))
             .addStatement("return super.get" + Utils.capitalize(element.getSimpleName().toString()) + "()")
