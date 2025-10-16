@@ -6,7 +6,7 @@ import javax.tools.Diagnostic.Kind;
 public class Logger {
 
     private Messager messager;
-    private boolean debug = true;
+    private boolean debug = false;
 
     public Logger(Messager messager) {
         this.messager = messager;
