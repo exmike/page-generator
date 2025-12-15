@@ -47,12 +47,16 @@ public record PageCollectorImpl(
         log.debug("Finished collectPages");
         return pages;
     }
-
+    /*
+    Метод для проверки соответствия типов в PageObject'ах, вероятно надо будет расширять пул типов
+     */
     private boolean isLocatorField(VariableElement field, ProcessingEnvironment processingEnv) {
         Elements elements = processingEnv.getElementUtils();
         Types types = processingEnv.getTypeUtils();
         TypeElement locatorElement = elements.getTypeElement("com.microsoft.playwright.Locator");
-        return types.isAssignable(field.asType(), locatorElement.asType());
+        TypeElement frameLocator = elements.getTypeElement("com.microsoft.playwright.FrameLocator");
+        return types.isAssignable(field.asType(), locatorElement.asType())
+            || types.isAssignable(field.asType(), frameLocator.asType());
     }
 
     private void checkCorrectFields(List<? extends Element> elements, Element page) {
