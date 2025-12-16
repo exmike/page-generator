@@ -80,7 +80,7 @@ public class SpecsCreator {
         return MethodSpec.methodBuilder(element.getSimpleName().toString())
             .addModifiers(Modifier.PUBLIC)
             .returns(type)
-            .addStatement("return new $T(page)", type)
+            .addStatement("return new $T(super.getPage())", type)
             .build();
     }
 
