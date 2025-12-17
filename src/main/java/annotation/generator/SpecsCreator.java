@@ -73,7 +73,7 @@ public class SpecsCreator {
     Генерирует вложенные методы для внутренних инициализаций пейджей
     */
     public MethodSpec generateInnerScreenMethods(ExecutableElement element) {
-        TypeName returnType = TypeName.get(element.getReturnType());
+        ClassName returnType = ClassName.get(PACKAGE_NAME, Utils.capitalize(element.getSimpleName().toString()) + "Gen");
         return MethodSpec.methodBuilder(element.getSimpleName().toString())
             .addModifiers(Modifier.PUBLIC)
             .returns(returnType)
