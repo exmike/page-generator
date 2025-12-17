@@ -26,6 +26,8 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeMirror;
+
 import model.Element;
 import model.Page;
 import util.Utils;
@@ -71,16 +73,11 @@ public class SpecsCreator {
     Генерирует вложенные методы для внутренних инициализаций пейджей
     */
     public MethodSpec generateInnerScreenMethods(ExecutableElement element) {
-        /*
-        test.page.LoginScreen -> LoginScreen
-         */
-        String className = ((DeclaredType) element.getReturnType())
-            .asElement().getSimpleName().toString();
-        ClassName type = ClassName.get(PACKAGE_NAME, className);
+        TypeName returnType = TypeName.get(element.getReturnType());
         return MethodSpec.methodBuilder(element.getSimpleName().toString())
             .addModifiers(Modifier.PUBLIC)
-            .returns(type)
-            .addStatement("return new $T(super.getPage())", type)
+            .returns(returnType)
+            .addStatement("return new $T(super.getPage())", returnType)
             .build();
     }
 
@@ -102,7 +99,7 @@ public class SpecsCreator {
 
     private Builder buildStatements(ExecutableElement method, VariableElement field, Element element,
         Builder builder, PageElement pageElement, String actionStatement) {
-            builder.addStatement(actionStatement, element.getType());
+        builder.addStatement(actionStatement, element.getType());
         return builder.addStatement("return this");
     }
 
