@@ -62,7 +62,7 @@ public class Utils {
     public static void checkCorrectMethods(List<? extends javax.lang.model.element.Element> elements) {
         checkDuplicates(elements);
         elements.stream()
-            .filter(element -> !Utils.containsIgnoreCase("getElement", element.getSimpleName().toString()))
+            .filter(element -> !Utils.containsIgnoreCase("getCollection", element.getSimpleName().toString()))
             .forEach(method -> {
             if (isNotAnnotated(method, Action.class)) {
                 throw new RuntimeException(
