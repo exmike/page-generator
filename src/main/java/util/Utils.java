@@ -12,6 +12,7 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Name;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
+import jdk.jshell.execution.Util;
 import model.Element;
 
 public class Utils {
@@ -60,17 +61,19 @@ public class Utils {
 
     public static void checkCorrectMethods(List<? extends javax.lang.model.element.Element> elements) {
         checkDuplicates(elements);
-        elements.forEach(method -> {
+        elements.stream()
+            .filter(element -> !Utils.containsIgnoreCase("getElement", element.getSimpleName().toString()))
+            .forEach(method -> {
             if (isNotAnnotated(method, Action.class)) {
                 throw new RuntimeException(
                     String.format("Метод с названием %s в классе %s должен быть с аннотацией Action",
-                        method.getSimpleName(), method.getEnclosingElement().getSimpleName().toString()));
+                        method.getSimpleName(), method.getEnclosingElement().getSimpleName()));
             }
 
             if (method.getAnnotation(Action.class).value().isEmpty()) {
                 throw new RuntimeException(
                     String.format("Метод с названием %s в классе %s в аннотации Action должен иметь не пустое значение",
-                        method.getSimpleName(), method.getEnclosingElement().getSimpleName().toString())
+                        method.getSimpleName(), method.getEnclosingElement().getSimpleName())
                 );
             }
         });

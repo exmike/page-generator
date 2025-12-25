@@ -1,7 +1,10 @@
 package test.page;
 
+import annotation.PageElement;
 import annotation.PageObject;
+import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
+import lombok.Getter;
 
 @PageObject
 public class ErrorScreen {
@@ -12,6 +15,9 @@ public class ErrorScreen {
         this.page = page;
     }
 
+    @PageElement("123")
+    @Getter
+    protected Locator kekElementsList = page.locator("123");
 //    @PageElement("Удалить")
 //    protected Locator deleteButton = page.locator("");
 
