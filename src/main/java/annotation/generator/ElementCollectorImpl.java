@@ -14,6 +14,7 @@ import javax.lang.model.util.ElementFilter;
 import model.Collector;
 import model.Element;
 import util.Logger;
+import util.Utils;
 
 public record ElementCollectorImpl(
     RoundEnvironment roundEnv,
@@ -46,6 +47,9 @@ public record ElementCollectorImpl(
                 if (!((TypeElement) element).getSuperclass().toString().equals(Object.class.getName())) {
                     publicElementMethods.addAll(baseMethods);
                 }
+                publicElementMethods = publicElementMethods.stream()
+                    .filter(publicMethod -> !Utils.containsIgnoreCase("getCollection",
+                        publicMethod.getSimpleName().toString())).toList();
                 checkCorrectMethods(publicElementMethods);
                 elements.add(new Element(element.asType(), new ArrayList<>(publicElementMethods)));
             });
