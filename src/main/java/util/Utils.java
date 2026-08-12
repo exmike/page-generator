@@ -17,7 +17,12 @@ import model.Element;
 
 public class Utils {
 
-    public static final String PACKAGE_NAME = "page.generated";
+    /**
+     * @deprecated пакет генерации настраивается опцией {@link GeneratorConfig#OPTION_PACKAGE};
+     *     эта константа осталась как значение по умолчанию.
+     */
+    @Deprecated
+    public static final String PACKAGE_NAME = GeneratorConfig.DEFAULT_PACKAGE;
     public static final String WHITESPACE = " ";
 
     //todo mb rework

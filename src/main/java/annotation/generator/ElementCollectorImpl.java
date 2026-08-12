@@ -4,22 +4,31 @@ import static util.Utils.checkCorrectMethods;
 import static util.Utils.validate;
 import annotation.BaseElement;
 import annotation.generator.interfaces.ElementCollector;
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
 import model.Collector;
 import model.Element;
+import util.GeneratorConfig;
 import util.Logger;
 import util.Utils;
 
 public record ElementCollectorImpl(
     RoundEnvironment roundEnv,
     Logger log,
-    Collector collector) implements ElementCollector {
+    Collector collector,
+    ProcessingEnvironment processingEnvironment,
+    GeneratorConfig config) implements ElementCollector {
 
     /**
      * Метод, который собирает все элементы проаннотированные Element и к каждому Element добавляет все методы из
@@ -32,7 +41,7 @@ public record ElementCollectorImpl(
         List<Element> elements = new ArrayList<>();
         List<ExecutableElement> baseMethods = getBaseMethods();
 
-        roundEnv.getElementsAnnotatedWith(annotation.Element.class)
+        findAnnotated(annotation.Element.class)
             .forEach(element -> {
                 if (element.getAnnotation(annotation.Element.class).value().isEmpty()) {
                     throw new RuntimeException(
@@ -59,18 +68,43 @@ public record ElementCollectorImpl(
         return elements;
     }
 
+    /**
+     * Ищет классы с заданной аннотацией.
+     *
+     * <p>По умолчанию — в исходниках текущего модуля, как и раньше. Если задана опция
+     * {@link GeneratorConfig#OPTION_ELEMENTS_PACKAGE}, поиск идёт по указанному пакету через модель
+     * компиляции, поэтому обёртки элементов могут лежать в отдельном модуле и приходить сюда уже
+     * скомпилированными.
+     */
+    private Set<? extends javax.lang.model.element.Element> findAnnotated(Class<? extends Annotation> annotation) {
+        if (!config.hasElementsPackage()) {
+            return roundEnv.getElementsAnnotatedWith(annotation);
+        }
+        PackageElement elementsPackage =
+            processingEnvironment.getElementUtils().getPackageElement(config.elementsPackage());
+        if (elementsPackage == null) {
+            throw new RuntimeException(String.format(
+                "Пакет '%s' из опции %s не найден. Проверь, что модуль с обёртками элементов подключён "
+                    + "как зависимость этого модуля", config.elementsPackage(), GeneratorConfig.OPTION_ELEMENTS_PACKAGE));
+        }
+        return ElementFilter.typesIn(elementsPackage.getEnclosedElements())
+            .stream()
+            .filter(type -> !Utils.isNotAnnotated(type, annotation))
+            .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
     /*
     Получение всех методов из класса аннотированного BaseElement
      */
     private List<ExecutableElement> getBaseMethods() {
-        List<ExecutableElement> baseMethods = new ArrayList<>();
-        try {
-            baseMethods = getPublicMethods(roundEnv.getElementsAnnotatedWith(BaseElement.class)
-                .stream().toList().get(0));
-            log.debug("Base methods collected successfully");
-        } catch (Exception e) {
-            log.error("Error collecting base methods: " + e.getMessage());
-        }
+        /*
+        validateBaseElement() уже гарантировал ровно один @BaseElement, поэтому здесь не глотаем
+        исключения: без базовых методов страницы сгенерируются без checkVisible и подобных, и
+        падение произойдёт позже и в другом месте
+         */
+        javax.lang.model.element.Element baseElement = findAnnotated(BaseElement.class).iterator().next();
+        List<ExecutableElement> baseMethods = getPublicMethods(baseElement);
+        log.debug("Base methods collected successfully: " + baseMethods.size());
         return baseMethods;
     }
 
@@ -88,7 +122,7 @@ public record ElementCollectorImpl(
     Проверка наличия BaseElement в единственном экземпляре
      */
     private void validateBaseElement() {
-        long baseElementCount = roundEnv.getElementsAnnotatedWith(BaseElement.class).size();
+        long baseElementCount = findAnnotated(BaseElement.class).size();
         log.debug("Number of BaseElement annotations found: " + baseElementCount);
         if (baseElementCount != 1) {
             throw new RuntimeException(
