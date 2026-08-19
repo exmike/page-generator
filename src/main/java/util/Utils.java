@@ -17,7 +17,12 @@ import model.Element;
 
 public class Utils {
 
-    public static final String PACKAGE_NAME = "page.generated";
+    /**
+     * @deprecated пакет генерации настраивается опцией {@link GeneratorConfig#OPTION_PACKAGE};
+     *     эта константа осталась как значение по умолчанию.
+     */
+    @Deprecated
+    public static final String PACKAGE_NAME = GeneratorConfig.DEFAULT_PACKAGE;
     public static final String WHITESPACE = " ";
 
     //todo mb rework
@@ -61,9 +66,7 @@ public class Utils {
 
     public static void checkCorrectMethods(List<? extends javax.lang.model.element.Element> elements) {
         checkDuplicates(elements);
-        elements.stream()
-            .filter(element -> !Utils.containsIgnoreCase("getCollection", element.getSimpleName().toString()))
-            .forEach(method -> {
+        elements.forEach(method -> {
             if (isNotAnnotated(method, Action.class)) {
                 throw new RuntimeException(
                     String.format("Метод с названием %s в классе %s должен быть с аннотацией Action",

@@ -9,6 +9,7 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
+import util.GeneratorConfig;
 import util.Logger;
 
 @SupportedAnnotationTypes("annotation.*")
@@ -20,13 +21,20 @@ public class PageProcessor extends AbstractProcessor {
     private int roundCount = 0;
 
     @Override
+    public Set<String> getSupportedOptions() {
+        return GeneratorConfig.SUPPORTED_OPTIONS;
+    }
+
+    @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         roundCount++;
         if (roundCount > MAX_ROUNDS) {
             return true;
         }
         Logger log = new Logger(processingEnv.getMessager());
-        PageGenerator pageGenerator = new PageGenerator(log, roundEnv, new SpecsCreator(), processingEnv);
+        GeneratorConfig config = GeneratorConfig.from(processingEnv);
+        PageGenerator pageGenerator =
+            new PageGenerator(log, roundEnv, new SpecsCreator(config), processingEnv, config);
 
         switch (roundCount) {
             /*
